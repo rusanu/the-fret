@@ -10,7 +10,7 @@
     [highlightSet]="panel.highlightSet"
     [activeRegion]="panel.activeRegion"
     [voicing]="panel.voicing"
-    [showNoteLabels]="panel.showNoteLabels"
+    [showNoteLabels]="panel.type === 'voicing' || panel.showNoteLabels"
     [showDegrees]="panel.showDegrees"
     [dimUnset]="true"
   />
