@@ -7,11 +7,11 @@ export interface VoicingPosition {
 }
 
 export interface Voicing {
-  shape: string;        // 'E', 'A', 'D'
+  shape: string;
   quality: 'major' | 'minor';
   rootFret: number;
   rootString: number;
-  label: string;        // e.g. "Am  (E-shape)"
+  label: string;
   positions: VoicingPosition[];
   mutedStrings: number[];
 }
@@ -27,9 +27,11 @@ interface ShapeTemplate {
 }
 
 // E and A shape offsets verified against standard barre chord fingerings.
-// D shape verified against open D and Dm chords.
-// C and G shapes omitted: their negative-offset fingers make them impractical
-// as movable barre shapes and they are rarely played that way.
+// D shape verified against open D/Dm chords.
+// C-shape (root str5): negative offsets make it impractical as a movable barre
+//   above fret 3, but the invalid-fret guard filters those out automatically,
+//   so it correctly surfaces as the open C chord when root fret = 3.
+// G-shape (root str6): same reasoning — only valid as the open G chord (root fret 3).
 const SHAPE_TEMPLATES: ShapeTemplate[] = [
   {
     id: 'E', quality: 'major', rootString: 6,
@@ -97,11 +99,41 @@ const SHAPE_TEMPLATES: ShapeTemplate[] = [
     ],
     mutedStrings: [6, 5],
   },
+  // C-shape: valid only when root on str5 >= fret 3 (negative-offset fingers
+  // would otherwise go below fret 0). Surfaces the open C chord at root fret 3.
+  {
+    id: 'C', quality: 'major', rootString: 5,
+    fingers: [
+      { string: 5, offset:  0, tone: '1' },
+      { string: 4, offset: -1, tone: '3' },
+      { string: 3, offset: -3, tone: '5' },
+      { string: 2, offset: -2, tone: '1' },
+      { string: 1, offset: -3, tone: '3' },
+    ],
+    mutedStrings: [6],
+  },
+  // G-shape: valid only when root on str6 >= fret 3. Surfaces the open G chord.
+  {
+    id: 'G', quality: 'major', rootString: 6,
+    fingers: [
+      { string: 6, offset:  0, tone: '1' },
+      { string: 5, offset: -1, tone: '3' },
+      { string: 4, offset: -3, tone: '5' },
+      { string: 3, offset: -3, tone: '1' },
+      { string: 2, offset: -3, tone: '3' },
+      { string: 1, offset:  0, tone: '1' },
+    ],
+    mutedStrings: [],
+  },
 ];
 
+function openStringCount(positions: VoicingPosition[]): number {
+  return positions.filter(p => p.fret === 0).length;
+}
+
 // Return the voicing whose root fret is closest to targetFret.
-// Considers the lowest occurrence of the root on each shape's primary string,
-// plus the octave above it, so both open-position and higher-neck shapes compete.
+// Tie-break on open-string count: more open strings wins (prefers conventional
+// open chord voicings over barre equivalents at the same distance).
 export function findBestShape(
   rootPc: number,
   quality: 'major' | 'minor',
@@ -111,6 +143,7 @@ export function findBestShape(
   const templates = SHAPE_TEMPLATES.filter(t => t.quality === quality);
   let best: Voicing | null = null;
   let bestDist = Infinity;
+  let bestOpen = -1;
 
   for (const tmpl of templates) {
     const base = fretForPitchClass(rootPc, tmpl.rootString, tuning);
@@ -122,24 +155,27 @@ export function findBestShape(
         tone: f.tone,
       }));
 
-      // Skip if any fret is out of range
       if (positions.some(p => p.fret < 0 || p.fret > 24)) continue;
 
-      const dist = Math.abs(rootFret - targetFret);
-      if (dist < bestDist) {
-        bestDist = dist;
-        const rootName  = NOTE_NAMES_COMMON[rootPc];
-        const qualLabel = quality === 'major' ? '' : 'm';
-        best = {
-          shape: tmpl.id,
-          quality,
-          rootFret,
-          rootString: tmpl.rootString,
-          label: `${rootName}${qualLabel}  (${tmpl.id}-shape)`,
-          positions,
-          mutedStrings: tmpl.mutedStrings,
-        };
-      }
+      const dist  = Math.abs(rootFret - targetFret);
+      const opens = openStringCount(positions);
+
+      const isBetter = dist < bestDist || (dist === bestDist && opens > bestOpen);
+      if (!isBetter) continue;
+
+      bestDist = dist;
+      bestOpen = opens;
+      const rootName  = NOTE_NAMES_COMMON[rootPc];
+      const qualLabel = quality === 'major' ? '' : 'm';
+      best = {
+        shape: tmpl.id,
+        quality,
+        rootFret,
+        rootString: tmpl.rootString,
+        label: `${rootName}${qualLabel}  (${tmpl.id}-shape)`,
+        positions,
+        mutedStrings: tmpl.mutedStrings,
+      };
     }
   }
 
