@@ -23,6 +23,7 @@ export const PITCH_SET_LIBRARY: readonly PitchSetDef[] = [
   { name: 'Aeolian (Natural minor)',   intervals: [0,2,3,5,7,8,10], category: 'mode' },
   { name: 'Locrian',                  intervals: [0,1,3,5,6,8,10], category: 'mode' },
   // Arpeggios — chord formulas (AGENTS.md §3.2/3.3), rendered as single-note shapes
+  { name: 'Power (5)',        intervals: [0,7],              category: 'arpeggio' },
   { name: 'Major triad',      intervals: [0,4,7],           category: 'arpeggio' },
   { name: 'Minor triad',      intervals: [0,3,7],           category: 'arpeggio' },
   { name: 'Diminished',       intervals: [0,3,6],           category: 'arpeggio' },

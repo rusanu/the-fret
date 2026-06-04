@@ -2,20 +2,28 @@
 
 .chord-finder {
   display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.finder-row {
+  display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
+
+  &--inline { flex-wrap: nowrap; }
 }
 
-.chord-root {
-  font-family: monospace;
-  font-size: 14px;
-  font-weight: 700;
-  color: #c8a84b;
-  min-width: 24px;
+.control-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4a4a4a;
+  flex-shrink: 0;
 }
 
-.quality-select {
+.type-select {
   background: #1a1a1a;
   color: #bbb;
   border: 1px solid #333;
@@ -23,6 +31,7 @@
   padding: 5px 8px;
   font-size: 13px;
   cursor: pointer;
+  min-width: 160px;
 
   &:focus { outline: 1px solid #c8a84b; border-color: #c8a84b; }
   option  { background: #1a1a1a; }
@@ -31,6 +40,7 @@
 .near-label {
   font-size: 12px;
   color: #4a4a4a;
+  flex-shrink: 0;
 }
 
 .fret-input {
@@ -44,7 +54,6 @@
   text-align: center;
 
   &:focus { outline: 1px solid #c8a84b; border-color: #c8a84b; }
-  // hide number spinner arrows
   &::-webkit-outer-spin-button,
   &::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 }
@@ -57,20 +66,9 @@
   color: #7ab0e0;
   font-size: 12px;
   cursor: pointer;
+  flex-shrink: 0;
   transition: background 0.12s;
 
   &:hover:not(:disabled) { background: #243d60; }
   &:disabled { opacity: 0.35; cursor: default; }
-}
-
-.clear-btn {
-  padding: 5px 8px;
-  border: 1px solid #2e2e2e;
-  border-radius: 4px;
-  background: #1a1a1a;
-  color: #666;
-  font-size: 12px;
-  cursor: pointer;
-
-  &:hover { background: #242424; color: #aaa; }
 }

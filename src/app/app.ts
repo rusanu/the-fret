@@ -12,6 +12,7 @@ import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_COMMON } from './core/pitch';
 import { STANDARD_TUNING } from './core/tuning';
 
+
 @Component({
   selector: 'app-root',
   standalone: true,
@@ -61,14 +62,12 @@ export class App {
   }
 
   onChordFind(query: ChordQuery): void {
-    if (this.selectedRoot === null) return;
-    const voicing = findBestShape(this.selectedRoot, query.quality, query.fret, STANDARD_TUNING);
+    const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, STANDARD_TUNING);
     if (!voicing) return;
-    const rootName  = NOTE_NAMES_COMMON[this.selectedRoot];
-    const qualLabel = query.quality === 'major' ? '' : 'm';
+    const rootName = NOTE_NAMES_COMMON[query.rootPc];
     this.panels = [{
       id: `panel-${++this.nextId}`,
-      title: `${rootName}${qualLabel} near fret ${query.fret}`,
+      title: `${rootName} ${query.chordName} near fret ${query.fret}`,
       type: 'voicing',
       voicing,
       highlightSet: null,

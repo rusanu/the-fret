@@ -1,27 +1,42 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { RootSelectorComponent } from '../../controls/root-selector/root-selector';
 import { NOTE_NAMES_COMMON } from '../../core/pitch';
+import { PITCH_SET_LIBRARY, PitchSetDef } from '../../core/pitch-set';
 
 export interface ChordQuery {
-  quality: 'major' | 'minor';
+  rootPc: number;
+  intervals: readonly number[];
+  chordName: string;
   fret: number;
 }
 
 @Component({
   selector: 'app-chord-finder',
   standalone: true,
+  imports: [RootSelectorComponent],
   templateUrl: './chord-finder.html',
   styleUrl: './chord-finder.scss'
 })
 export class ChordFinderComponent {
-  @Input() rootPc: number | null = null;
-  @Output() findChord  = new EventEmitter<ChordQuery>();
-  @Output() clearChord = new EventEmitter<void>();
+  @Output() findChord = new EventEmitter<ChordQuery>();
 
-  quality: 'major' | 'minor' = 'minor';
+  readonly chordTypes: PitchSetDef[] = PITCH_SET_LIBRARY.filter(p => p.category === 'arpeggio') as PitchSetDef[];
+
+  selectedRoot: number | null = null;
+  selectedType: PitchSetDef = this.chordTypes[0]; // default: Power (5)
   targetFret = 5;
 
   get rootName(): string {
-    return this.rootPc !== null ? NOTE_NAMES_COMMON[this.rootPc] : '—';
+    return this.selectedRoot !== null ? NOTE_NAMES_COMMON[this.selectedRoot] : '—';
+  }
+
+  onRootSelected(pc: number | null): void {
+    this.selectedRoot = pc;
+  }
+
+  onTypeChange(event: Event): void {
+    const name = (event.target as HTMLSelectElement).value;
+    this.selectedType = this.chordTypes.find(t => t.name === name) ?? this.chordTypes[0];
   }
 
   onFretInput(event: Event): void {
@@ -30,11 +45,12 @@ export class ChordFinderComponent {
   }
 
   onFind(): void {
-    if (this.rootPc === null) return;
-    this.findChord.emit({ quality: this.quality, fret: this.targetFret });
-  }
-
-  onClear(): void {
-    this.clearChord.emit();
+    if (this.selectedRoot === null) return;
+    this.findChord.emit({
+      rootPc: this.selectedRoot,
+      intervals: this.selectedType.intervals,
+      chordName: this.selectedType.name,
+      fret: this.targetFret,
+    });
   }
 }
