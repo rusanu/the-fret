@@ -4,16 +4,12 @@ Items discovered during development, not yet scheduled into an iteration.
 
 ---
 
-## Scale / PitchSet Library
+## UX / Controls
 
-- **Cross-reference Major↔Ionian and Natural minor↔Aeolian in the selector** — These are the same
-  intervals under different names. Both should appear in *both* the Scales and Modes groups, with
-  labels that make the relationship explicit:
-  - Scales group: `"Major (Ionian)"`, `"Natural minor (Aeolian)"`
-  - Modes group: `"Ionian (Major)"`, `"Aeolian (Natural minor)"`
-  The `PITCH_SET_LIBRARY` entries should stay deduplicated (one formula each); the selector UI
-  synthesises the duplicate display entries from the same `PitchSetDef` object, so highlighting
-  behaviour is identical regardless of which label the user picks.
+- **Rename "Labels" toggle to "Notes" or "Pitch"** — The current label is ambiguous (it could
+  refer to any text label). "Notes" is clearer: it means "show the pitch name on each dot."
+  Change is a one-word edit in `app.html`; `showNoteLabels` property name in the component
+  can stay as-is (it's internal).
 
 ---
 
@@ -45,13 +41,3 @@ Items discovered during development, not yet scheduled into an iteration.
   - Region awareness: show each chord in the selected box/region (e.g. "all in Box 1") or
     in the closest CAGED shape to the previous chord (voice-leading mode).
   - Audio can be layered on top later once the audio engine exists, but is not a blocker.
-
----
-
-## UX / Fretboard
-
-- **Toggle note labels on/off** — Note labels on every fret are visually heavy and overwhelm the
-  neck view. Add a show/hide toggle in the UI. The `FretboardComponent` already accepts
-  `[showNoteLabels]` as an input; the AppComponent just needs a button wired to it.
-  Consider making labels hidden by default once scale/chord highlighting (Iteration 2) lands,
-  so the neck starts clean and labels are opt-in.
