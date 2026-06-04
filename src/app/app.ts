@@ -63,13 +63,16 @@ export class App {
     this.activeRegion = region;
   }
 
+  private static readonly CAGED_SHAPES = new Set(['C', 'A', 'G', 'E', 'D']);
+
   onChordFind(query: ChordQuery): void {
     const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, STANDARD_TUNING);
     if (!voicing) return;
-    const rootName = NOTE_NAMES_COMMON[query.rootPc];
+    const rootName  = NOTE_NAMES_COMMON[query.rootPc];
+    const shapeTag  = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
     this.panels = [{
       id: `panel-${++this.nextId}`,
-      title: `${rootName} ${query.chordName} near fret ${query.fret}`,
+      title: `${rootName} ${query.chordName} near fret ${query.fret}${shapeTag}`,
       type: 'voicing',
       voicing,
       highlightSet: null,
