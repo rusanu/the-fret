@@ -21,6 +21,10 @@
     />
   </div>
   <div class="control-group">
+    <span class="control-label">Tuning</span>
+    <app-tuning-selector (tuningSelected)="onTuningSelected($event)" />
+  </div>
+  <div class="control-group">
     <span class="control-label">Labels</span>
     <div class="opt-btns">
       <button class="opt-btn" [class.active]="labelMode === 'notes'"   (click)="labelMode = 'notes'">Notes</button>
@@ -31,6 +35,7 @@
 
 <main>
   <app-fretboard
+    [tuning]="selectedTuning"
     [highlightSet]="highlightSet"
     [activeRegion]="activeRegion"
     [showNoteLabels]="showNoteLabels"

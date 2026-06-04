@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Voicing } from '../../core/caged';
 import { Region } from '../../core/region';
+import { Tuning, STANDARD_TUNING } from '../../core/tuning';
 import { FretboardComponent, HighlightSet } from '../../fretboard/fretboard';
 
 export interface FretboardPanel {
@@ -12,7 +13,10 @@ export interface FretboardPanel {
   activeRegion: Region | null;
   showNoteLabels: boolean;
   showDegrees: boolean;
+  tuning: Tuning;
 }
+
+export { STANDARD_TUNING }; // re-export for panel creation convenience
 
 @Component({
   selector: 'app-fretboard-panel',

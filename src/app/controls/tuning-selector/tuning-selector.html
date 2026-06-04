@@ -1,0 +1,5 @@
+<select class="tuning-select" (change)="onChange($event)">
+  @for (p of presets; track p.name) {
+    <option [value]="p.name">{{ p.name }}</option>
+  }
+</select>

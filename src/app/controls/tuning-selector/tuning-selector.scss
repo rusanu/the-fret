@@ -1,0 +1,16 @@
+:host { display: block; }
+
+.tuning-select {
+  background: #1a1a1a;
+  color: #bbb;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 12px;
+  font-family: monospace;
+  cursor: pointer;
+  min-width: 220px;
+
+  &:focus { outline: 1px solid #c8a84b; border-color: #c8a84b; }
+  option  { background: #1a1a1a; }
+}

@@ -3,27 +3,28 @@ import { FretboardComponent, HighlightSet } from './fretboard/fretboard';
 import { RootSelectorComponent } from './controls/root-selector/root-selector';
 import { PitchSetSelectorComponent } from './controls/pitch-set-selector/pitch-set-selector';
 import { RegionSelectorComponent } from './controls/region-selector/region-selector';
+import { TuningSelectorComponent } from './controls/tuning-selector/tuning-selector';
 import { ChordFinderComponent, ChordQuery } from './query/chord-finder/chord-finder';
 import { FretboardPanelComponent, FretboardPanel } from './shared/fretboard-panel/fretboard-panel';
-import { PitchSetDef } from './core/pitch-set';
+import { PitchSetDef, pitchesInSet } from './core/pitch-set';
 import { findBestShape } from './core/caged';
-import { pitchesInSet } from './core/pitch-set';
 import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_COMMON } from './core/pitch';
-import { STANDARD_TUNING } from './core/tuning';
-
+import { Tuning, STANDARD_TUNING } from './core/tuning';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [FretboardComponent, RootSelectorComponent, PitchSetSelectorComponent,
-            RegionSelectorComponent, ChordFinderComponent, FretboardPanelComponent],
+            RegionSelectorComponent, TuningSelectorComponent,
+            ChordFinderComponent, FretboardPanelComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
 export class App {
   selectedRoot: number | null = null;
   selectedSetDef: PitchSetDef | null = null;
+  selectedTuning: Tuning = STANDARD_TUNING;
 
   labelMode: 'notes' | 'degrees' = 'notes';
 
@@ -37,6 +38,8 @@ export class App {
   panels: FretboardPanel[] = [];
   private nextId = 0;
 
+  private static readonly CAGED_SHAPES = new Set(['C', 'A', 'G', 'E', 'D']);
+
   get inSetPcs(): Set<number> {
     if (!this.highlightSet) return new Set();
     return pitchesInSet(this.highlightSet.root, this.highlightSet.intervals);
@@ -48,9 +51,7 @@ export class App {
 
   onRootSelected(root: number | null): void {
     this.selectedRoot = root;
-    const prevId = this.activeRegion?.id ?? null;
-    this.regions = root !== null ? computeRegions(root, STANDARD_TUNING) : [];
-    this.activeRegion = prevId ? (this.regions.find(r => r.id === prevId) ?? null) : null;
+    this.recomputeRegions();
     this.syncHighlightSet();
   }
 
@@ -63,13 +64,16 @@ export class App {
     this.activeRegion = region;
   }
 
-  private static readonly CAGED_SHAPES = new Set(['C', 'A', 'G', 'E', 'D']);
+  onTuningSelected(tuning: Tuning): void {
+    this.selectedTuning = tuning;
+    this.recomputeRegions();
+  }
 
   onChordFind(query: ChordQuery): void {
-    const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, STANDARD_TUNING);
+    const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, this.selectedTuning);
     if (!voicing) return;
-    const rootName  = NOTE_NAMES_COMMON[query.rootPc];
-    const shapeTag  = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
+    const rootName = NOTE_NAMES_COMMON[query.rootPc];
+    const shapeTag = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
     this.panels = [{
       id: `panel-${++this.nextId}`,
       title: `${rootName} ${query.chordName} near fret ${query.fret}${shapeTag}`,
@@ -79,6 +83,7 @@ export class App {
       activeRegion: null,
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
+      tuning: this.selectedTuning,
     }, ...this.panels];
   }
 
@@ -96,11 +101,20 @@ export class App {
       activeRegion: this.activeRegion ? { ...this.activeRegion } : null,
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
+      tuning: this.selectedTuning,
     }, ...this.panels];
   }
 
   onRemovePanel(id: string): void {
     this.panels = this.panels.filter(p => p.id !== id);
+  }
+
+  private recomputeRegions(): void {
+    const prevId = this.activeRegion?.id ?? null;
+    this.regions = this.selectedRoot !== null
+      ? computeRegions(this.selectedRoot, this.selectedTuning)
+      : [];
+    this.activeRegion = prevId ? (this.regions.find(r => r.id === prevId) ?? null) : null;
   }
 
   private syncHighlightSet(): void {
