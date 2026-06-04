@@ -23,9 +23,9 @@ export class ChordFinderComponent {
 
   readonly chordTypes: PitchSetDef[] = PITCH_SET_LIBRARY.filter(p => p.category === 'arpeggio') as PitchSetDef[];
   readonly shapeOptions = [
-    { id: 'auto', label: 'Auto' },
-    { id: 'E', label: 'E' }, { id: 'A', label: 'A' },
-    { id: 'D', label: 'D' }, { id: 'C', label: 'C' }, { id: 'G', label: 'G' },
+    { id: 'auto', label: 'Any shape' },
+    { id: 'E', label: 'E shape' }, { id: 'A', label: 'A shape' },
+    { id: 'D', label: 'D shape' }, { id: 'C', label: 'C shape' }, { id: 'G', label: 'G shape' },
   ];
 
   selectedRoot: number | null = null;

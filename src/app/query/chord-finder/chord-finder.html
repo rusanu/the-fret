@@ -10,6 +10,7 @@
       }
     </select>
     @if (isCagedCompatible) {
+      <span class="near-label">CAGED</span>
       <select class="shape-select" [value]="selectedShape" (change)="onShapeChange($event)">
         @for (s of shapeOptions; track s.id) {
           <option [value]="s.id">{{ s.label }}</option>
