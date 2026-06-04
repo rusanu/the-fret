@@ -26,6 +26,12 @@
 
   &.accidental { font-size: 11px; }
 
+  &.in-set {
+    background: #1a5c8a;
+    border-color: #3a9fd0;
+    color: #dde8ff;
+  }
+
   &.active {
     background: #c8a84b;
     border-color: #c8a84b;

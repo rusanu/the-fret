@@ -6,7 +6,7 @@
 <div class="controls-bar">
   <div class="control-group">
     <span class="control-label">Root</span>
-    <app-root-selector (rootSelected)="onRootSelected($event)" />
+    <app-root-selector [inSetPcs]="inSetPcs" (rootSelected)="onRootSelected($event)" />
   </div>
   <div class="control-group">
     <span class="control-label">Scale / Arpeggio</span>

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
 interface RootButton { name: string; pc: number; }
 
@@ -9,6 +9,7 @@ interface RootButton { name: string; pc: number; }
   styleUrl: './root-selector.scss'
 })
 export class RootSelectorComponent {
+  @Input() inSetPcs: Set<number> = new Set();
   @Output() rootSelected = new EventEmitter<number | null>();
 
   readonly roots: RootButton[] = [

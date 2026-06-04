@@ -7,6 +7,7 @@ import { ChordFinderComponent, ChordQuery } from './query/chord-finder/chord-fin
 import { FretboardPanelComponent, FretboardPanel } from './shared/fretboard-panel/fretboard-panel';
 import { PitchSetDef } from './core/pitch-set';
 import { findBestShape } from './core/caged';
+import { pitchesInSet } from './core/pitch-set';
 import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_SHARP } from './core/pitch';
 import { STANDARD_TUNING } from './core/tuning';
@@ -33,6 +34,11 @@ export class App {
 
   panels: FretboardPanel[] = [];
   private nextId = 0;
+
+  get inSetPcs(): Set<number> {
+    if (!this.highlightSet) return new Set();
+    return pitchesInSet(this.highlightSet.root, this.highlightSet.intervals);
+  }
 
   get canSave(): boolean {
     return this.highlightSet !== null;
