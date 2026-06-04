@@ -23,7 +23,6 @@
   <div class="control-group">
     <span class="control-label">Labels</span>
     <div class="opt-btns">
-      <button class="opt-btn" [class.active]="labelMode === 'none'"    (click)="labelMode = 'none'">Off</button>
       <button class="opt-btn" [class.active]="labelMode === 'notes'"   (click)="labelMode = 'notes'">Notes</button>
       <button class="opt-btn" [class.active]="labelMode === 'degrees'" [disabled]="!highlightSet" (click)="labelMode = 'degrees'">Degrees</button>
     </div>
