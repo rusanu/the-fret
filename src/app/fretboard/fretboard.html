@@ -2,6 +2,7 @@
   <svg
     class="fretboard"
     [class.dim-unset]="dimUnset && !!highlightSet"
+    [class.has-chord-highlight]="!!chordHighlightPcs"
     [attr.viewBox]="viewBox"
     [attr.width]="svgWidth"
     [attr.height]="svgHeight"
@@ -70,6 +71,8 @@
           [class.state-in-set]="note.state === 'in-set'"
           [class.state-out-of-set]="note.state === 'out-of-set'"
           [class.region-out]="activeRegion && !note.inRegion"
+          [class.chord-tone]="chordHighlightPcs && chordHighlightPcs.has(note.pc)"
+          [class.chord-fade]="chordHighlightPcs && !chordHighlightPcs.has(note.pc) && (note.state === 'root' || note.state === 'in-set')"
           class="note-dot"
         />
         @if (shouldShowLabel(note)) {

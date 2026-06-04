@@ -33,6 +33,11 @@
   </div>
 </div>
 
+<app-chord-highlighter
+  [highlightSet]="highlightSet"
+  (chordPcsChanged)="onChordHighlighted($event)"
+/>
+
 <main>
   <app-fretboard
     [tuning]="selectedTuning"
@@ -40,6 +45,7 @@
     [activeRegion]="activeRegion"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
+    [chordHighlightPcs]="chordHighlightPcs"
     [dimUnset]="true"
   />
   <div class="main-actions">

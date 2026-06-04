@@ -1,0 +1,17 @@
+@if (isVisible && chords.length > 0) {
+  <div class="chord-highlighter">
+    <span class="control-label">Chords</span>
+    <div class="chord-chips">
+      @for (chord of chords; track chord.numeral) {
+        <button
+          class="chord-chip"
+          [class.active]="selectedChord === chord"
+          (click)="select(chord)"
+        >
+          <span class="chip-numeral">{{ chord.numeral }}</span>
+          <span class="chip-name">{{ chord.name }}</span>
+        </button>
+      }
+    </div>
+  </div>
+}

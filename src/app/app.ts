@@ -4,6 +4,7 @@ import { RootSelectorComponent } from './controls/root-selector/root-selector';
 import { PitchSetSelectorComponent } from './controls/pitch-set-selector/pitch-set-selector';
 import { RegionSelectorComponent } from './controls/region-selector/region-selector';
 import { TuningSelectorComponent } from './controls/tuning-selector/tuning-selector';
+import { ChordHighlighterComponent } from './controls/chord-highlighter/chord-highlighter';
 import { ChordFinderComponent, ChordQuery } from './query/chord-finder/chord-finder';
 import { FretboardPanelComponent, FretboardPanel } from './shared/fretboard-panel/fretboard-panel';
 import { PitchSetDef, pitchesInSet } from './core/pitch-set';
@@ -16,7 +17,7 @@ import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
   selector: 'app-root',
   standalone: true,
   imports: [FretboardComponent, RootSelectorComponent, PitchSetSelectorComponent,
-            RegionSelectorComponent, TuningSelectorComponent,
+            RegionSelectorComponent, TuningSelectorComponent, ChordHighlighterComponent,
             ChordFinderComponent, FretboardPanelComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -35,6 +36,7 @@ export class App {
   regions: Region[] = [];
   activeRegion: Region | null = null;
 
+  chordHighlightPcs: Set<number> | null = null;
   panels: FretboardPanel[] = [];
   private nextId = 0;
 
@@ -70,6 +72,10 @@ export class App {
 
   onRegionSelected(region: Region | null): void {
     this.activeRegion = region;
+  }
+
+  onChordHighlighted(pcs: Set<number> | null): void {
+    this.chordHighlightPcs = pcs;
   }
 
   onTuningSelected(tuning: Tuning): void {

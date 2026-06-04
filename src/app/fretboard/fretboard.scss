@@ -86,9 +86,22 @@
   }
 }
 
-// Dim out-of-set notes when a set is active (class toggled on the SVG root)
-.fretboard.dim-unset .note-dot.state-out-of-set {
-  opacity: 0.08;
+// Dim out-of-set notes when a set is active
+.fretboard.dim-unset .note-dot.state-out-of-set { opacity: 0.08; }
+
+// Chord highlight overlay (when a diatonic chord is selected)
+.fretboard.has-chord-highlight {
+  .note-dot.chord-tone {
+    fill: #1a6e48;
+    stroke: #2ab870;
+    stroke-width: 1.5;
+
+    // If the chord root happens to be the scale root, keep it gold but brighter
+    &.state-root { fill: #c87828; stroke: #f0b040; stroke-width: 2; }
+  }
+
+  // Scale notes not in the selected chord fade back
+  .note-dot.chord-fade { opacity: 0.18; }
 }
 
 // Voicing dots (chord shape finder)

@@ -16,6 +16,7 @@ interface NoteCell {
   id: string;
   cx: number;
   cy: number;
+  pc: number;
   name: string;
   degree: string;
   isOpen: boolean;
@@ -57,6 +58,7 @@ export class FretboardComponent implements OnInit, OnChanges {
   @Input() highlightSet: HighlightSet | null = null;
   @Input() activeRegion: Region | null = null;
   @Input() voicing: Voicing | null = null;
+  @Input() chordHighlightPcs: Set<number> | null = null;
 
   private readonly LW = 32;
   private readonly FW = 40;
@@ -207,7 +209,7 @@ export class FretboardComponent implements OnInit, OnChanges {
         }
 
         const inRegion = !region || (f >= region.startFret && f <= region.endFret);
-        this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), name, degree, isOpen: f === 0, state, inRegion });
+        this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), pc, name, degree, isOpen: f === 0, state, inRegion });
       }
     }
   }
