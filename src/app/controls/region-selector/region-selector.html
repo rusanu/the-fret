@@ -19,11 +19,5 @@
       }
     </optgroup>
   }
-  @if (blues.length > 0) {
-    <optgroup label="Blues Boxes">
-      @for (r of blues; track r.id) {
-        <option [value]="r.id">{{ r.name }}</option>
-      }
-    </optgroup>
-  }
+  <!-- Blues boxes hidden from UX for now (code preserved in region.ts) -->
 </select>

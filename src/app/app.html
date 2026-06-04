@@ -25,14 +25,22 @@
     <div class="opt-btns">
       <button class="opt-btn" [class.active]="showNoteLabels" (click)="showNoteLabels = !showNoteLabels">Notes</button>
       <button class="opt-btn" [class.active]="showDegrees" [disabled]="!highlightSet" (click)="showDegrees = !showDegrees">Degrees</button>
-      <button class="opt-btn" [class.active]="dimUnset" [disabled]="!highlightSet" (click)="dimUnset = !dimUnset">Dim unset</button>
     </div>
   </div>
-  <div class="control-group control-group--push-right">
-    <span class="control-label">Snapshot</span>
+</div>
+
+<main>
+  <app-fretboard
+    [highlightSet]="highlightSet"
+    [activeRegion]="activeRegion"
+    [showNoteLabels]="showNoteLabels"
+    [showDegrees]="showDegrees"
+    [dimUnset]="true"
+  />
+  <div class="main-actions">
     <button class="save-btn" [disabled]="!canSave" (click)="onSaveMain()">Save view</button>
   </div>
-</div>
+</main>
 
 <div class="chord-bar">
   <span class="control-label">Chord finder</span>
@@ -42,16 +50,6 @@
     (clearChord)="$event"
   />
 </div>
-
-<main>
-  <app-fretboard
-    [highlightSet]="highlightSet"
-    [activeRegion]="activeRegion"
-    [showNoteLabels]="showNoteLabels"
-    [showDegrees]="showDegrees"
-    [dimUnset]="dimUnset"
-  />
-</main>
 
 @if (panels.length > 0) {
   <section class="panels-section">

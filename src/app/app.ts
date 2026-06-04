@@ -26,7 +26,6 @@ export class App {
 
   showNoteLabels = false;
   showDegrees = false;
-  dimUnset = true;
 
   highlightSet: HighlightSet | null = null;
   regions: Region[] = [];
@@ -67,7 +66,7 @@ export class App {
     if (!voicing) return;
     const rootName  = NOTE_NAMES_COMMON[this.selectedRoot];
     const qualLabel = query.quality === 'major' ? '' : 'm';
-    this.panels = [...this.panels, {
+    this.panels = [{
       id: `panel-${++this.nextId}`,
       title: `${rootName}${qualLabel} near fret ${query.fret}`,
       type: 'voicing',
@@ -76,7 +75,7 @@ export class App {
       activeRegion: null,
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
-    }];
+    }, ...this.panels];
   }
 
   onSaveMain(): void {
@@ -84,7 +83,7 @@ export class App {
     const rootName   = NOTE_NAMES_COMMON[this.highlightSet.root];
     const scaleName  = this.selectedSetDef?.name ?? '';
     const regionName = this.activeRegion?.name ?? 'All neck';
-    this.panels = [...this.panels, {
+    this.panels = [{
       id: `panel-${++this.nextId}`,
       title: `${rootName} ${scaleName} · ${regionName}`,
       type: 'snapshot',
@@ -93,7 +92,7 @@ export class App {
       activeRegion: this.activeRegion ? { ...this.activeRegion } : null,
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
-    }];
+    }, ...this.panels];
   }
 
   onRemovePanel(id: string): void {

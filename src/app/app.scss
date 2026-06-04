@@ -89,6 +89,12 @@
   }
 }
 
+.main-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.4rem 1rem 0;
+}
+
 .panels-section {
   border-top: 2px solid #1a1a1a;
 }
