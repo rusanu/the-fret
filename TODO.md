@@ -4,6 +4,19 @@ Items discovered during development, not yet scheduled into an iteration.
 
 ---
 
+## Scale / PitchSet Library
+
+- **Cross-reference Major↔Ionian and Natural minor↔Aeolian in the selector** — These are the same
+  intervals under different names. Both should appear in *both* the Scales and Modes groups, with
+  labels that make the relationship explicit:
+  - Scales group: `"Major (Ionian)"`, `"Natural minor (Aeolian)"`
+  - Modes group: `"Ionian (Major)"`, `"Aeolian (Natural minor)"`
+  The `PITCH_SET_LIBRARY` entries should stay deduplicated (one formula each); the selector UI
+  synthesises the duplicate display entries from the same `PitchSetDef` object, so highlighting
+  behaviour is identical regardless of which label the user picks.
+
+---
+
 ## UX / Fretboard
 
 - **Toggle note labels on/off** — Note labels on every fret are visually heavy and overwhelm the
