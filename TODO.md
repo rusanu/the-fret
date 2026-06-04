@@ -17,6 +17,8 @@ Items discovered during development, not yet scheduled into an iteration.
 - possible chord fingering suggestion. complicated because of barre posibilities, max number of fingers in a fret depends on fret physical width, difficult to model physical limitations like reach
 - chord finder should have also a CAGED shape mode ("find Gm in A shape").
 - there should be a "chord highlighter" feature. When the main fretboard is showing a scale/region, I should be able to select and highlight any chord *in the selected root/scale and region*. posibly display a dropdown of all possible triads (+7 too?) with the notes in the shown scale/region, must show as absolute (C/Cm etc) but maybe also as I,II, IV etc *in the selected root and scale*. 
+- beside the already planned chord progression mode, we need a lick/solo mode. enter a theme (eg. "C-E-G-F-D-A") show the voicings in region 1-5,6-10,11- etc. Maybe relative "move it up 5 frets". TBD how to handle actual pitch (A3 vs. A4 vs A5)
+
 
 ---
 
