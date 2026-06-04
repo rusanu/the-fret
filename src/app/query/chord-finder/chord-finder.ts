@@ -30,7 +30,7 @@ export class ChordFinderComponent {
   ];
 
   selectedRoot: number | null = null;
-  selectedType: PitchSetDef = this.chordTypes[0];
+  selectedType: PitchSetDef = this.chordTypes.find(t => t.name === 'Major triad') ?? this.chordTypes[0];
   selectedShape = 'auto';
   targetFret = 5;
 
