@@ -14,7 +14,11 @@
   </div>
   <div class="control-group">
     <span class="control-label">Region</span>
-    <app-region-selector [regions]="regions" (regionSelected)="onRegionSelected($event)" />
+    <app-region-selector
+      [regions]="regions"
+      [selectedRegionId]="activeRegion?.id ?? null"
+      (regionSelected)="onRegionSelected($event)"
+    />
   </div>
   <div class="control-group">
     <span class="control-label">View</span>
@@ -26,12 +30,25 @@
   </div>
 </div>
 
+<div class="chord-bar">
+  <span class="control-label">Chord finder</span>
+  <app-chord-finder
+    [rootPc]="selectedRoot"
+    (findChord)="onChordFind($event)"
+    (clearChord)="onChordClear()"
+  />
+  @if (activeVoicing) {
+    <span class="voicing-label">{{ activeVoicing.label }}</span>
+  }
+</div>
+
 <main>
   <app-fretboard
-    [highlightSet]="highlightSet"
+    [highlightSet]="activeVoicing ? null : highlightSet"
     [activeRegion]="activeRegion"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
     [dimUnset]="dimUnset"
+    [voicing]="activeVoicing"
   />
 </main>

@@ -9,6 +9,7 @@ import { Region } from '../../core/region';
 })
 export class RegionSelectorComponent implements OnChanges {
   @Input() regions: Region[] = [];
+  @Input() selectedRegionId: string | null = null;
   @Output() regionSelected = new EventEmitter<Region | null>();
 
   @ViewChild('selectEl') selectEl!: ElementRef<HTMLSelectElement>;
@@ -21,11 +22,10 @@ export class RegionSelectorComponent implements OnChanges {
     this.pentatonic = this.regions.filter(r => r.group === 'pentatonic');
     this.caged      = this.regions.filter(r => r.group === 'caged');
     this.blues      = this.regions.filter(r => r.group === 'blues');
-    // Reset to "All Neck" whenever available regions change (root changed)
+    // Sync the native select to the parent-controlled selection (after view is ready)
     if (this.selectEl) {
-      this.selectEl.nativeElement.value = '';
+      this.selectEl.nativeElement.value = this.selectedRegionId ?? '';
     }
-    this.regionSelected.emit(null);
   }
 
   onChange(event: Event): void {

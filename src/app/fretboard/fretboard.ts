@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { noteAt, noteNameAt } from '../core/pitch';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
+import { Voicing } from '../core/caged';
 import { Region } from '../core/region';
 import { STANDARD_TUNING } from '../core/tuning';
 
@@ -22,22 +23,23 @@ interface NoteCell {
   inRegion: boolean;
 }
 
-interface FretWire {
-  x: number;
-  isNut: boolean;
+interface VoicingDot {
+  id: string;
+  cx: number;
+  cy: number;
+  tone: string;
+  isRoot: boolean;
 }
 
-interface InlayDot {
+interface MutedMarker {
   id: string;
   cx: number;
   cy: number;
 }
 
-interface StringInfo {
-  num: number;
-  y: number;
-  strokeWidth: number;
-}
+interface FretWire { x: number; isNut: boolean; }
+interface InlayDot { id: string; cx: number; cy: number; }
+interface StringInfo { num: number; y: number; strokeWidth: number; }
 
 @Component({
   selector: 'app-fretboard',
@@ -53,8 +55,8 @@ export class FretboardComponent implements OnInit, OnChanges {
   @Input() dimUnset = true;
   @Input() highlightSet: HighlightSet | null = null;
   @Input() activeRegion: Region | null = null;
+  @Input() voicing: Voicing | null = null;
 
-  // Layout constants (px)
   private readonly LW = 32;
   private readonly FW = 40;
   private readonly PT = 26;
@@ -62,7 +64,6 @@ export class FretboardComponent implements OnInit, OnChanges {
 
   readonly DOT_R = 9;
 
-  // SVG geometry (set by rebuild)
   viewBox = '';
   svgWidth = 0;
   svgHeight = 0;
@@ -81,6 +82,8 @@ export class FretboardComponent implements OnInit, OnChanges {
   fretLabels: { x: number; label: string }[] = [];
   stringLabels: { x: number; y: number; label: string }[] = [];
   notes: NoteCell[] = [];
+  voicingDots: VoicingDot[] = [];
+  mutedMarkers: MutedMarker[] = [];
 
   private readonly MARKER_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21]);
   private readonly DOUBLE_FRETS  = new Set([12, 24]);
@@ -90,7 +93,8 @@ export class FretboardComponent implements OnInit, OnChanges {
   ngOnInit(): void { this.rebuild(); }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes || 'activeRegion' in changes) {
+    if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes ||
+        'activeRegion' in changes || 'voicing' in changes) {
       this.rebuild();
     }
   }
@@ -126,21 +130,17 @@ export class FretboardComponent implements OnInit, OnChanges {
     this.stringX1 = this.LW;
     this.stringX2 = this.LW + (fc + 1) * this.FW;
 
-    // Region bracket: left edge of startFret column → right edge of endFret column
     if (this.activeRegion) {
       this.regionBracketX = this.LW + this.activeRegion.startFret * this.FW;
       this.regionBracketW = (this.activeRegion.endFret - this.activeRegion.startFret + 1) * this.FW;
     }
 
     this.strings = [1, 2, 3, 4, 5, 6].map(s => ({
-      num: s,
-      y: this.ny(s),
-      strokeWidth: this.STR_WEIGHTS[s - 1]
+      num: s, y: this.ny(s), strokeWidth: this.STR_WEIGHTS[s - 1]
     }));
 
     this.fretWires = Array.from({ length: fc + 1 }, (_, n) => ({
-      x: this.LW + (n + 1) * this.FW,
-      isNut: n === 0
+      x: this.LW + (n + 1) * this.FW, isNut: n === 0
     }));
 
     const inlayMidY = this.PT + 2.5 * this.SS;
@@ -160,11 +160,27 @@ export class FretboardComponent implements OnInit, OnChanges {
       .map(f => ({ x: this.nx(f), label: String(f) }));
 
     this.stringLabels = [1, 2, 3, 4, 5, 6].map(s => ({
-      x: this.LW - 5,
-      y: this.ny(s) + 4,
-      label: String(s)
+      x: this.LW - 5, y: this.ny(s) + 4, label: String(s)
     }));
 
+    // Voicing dots (replaces scale dots when voicing is active)
+    if (this.voicing) {
+      this.voicingDots = this.voicing.positions.map(p => ({
+        id: `v${p.string}`,
+        cx: this.nx(p.fret),
+        cy: this.ny(p.string),
+        tone: p.tone,
+        isRoot: p.tone === '1',
+      }));
+      this.mutedMarkers = this.voicing.mutedStrings.map(s => ({
+        id: `mx${s}`, cx: this.nx(0), cy: this.ny(s),
+      }));
+    } else {
+      this.voicingDots = [];
+      this.mutedMarkers = [];
+    }
+
+    // Scale / arpeggio note cells (used when no voicing is active)
     const hs = this.highlightSet;
     const setNotes = hs ? pitchesInSet(hs.root, hs.intervals) : null;
     const region = this.activeRegion;
@@ -180,18 +196,15 @@ export class FretboardComponent implements OnInit, OnChanges {
 
         if (hs && setNotes) {
           if (pc === hs.root) {
-            state  = 'root';
-            degree = '1';
+            state = 'root'; degree = '1';
           } else if (setNotes.has(pc)) {
-            state  = 'in-set';
-            degree = degreeLabel(pc, hs.root);
+            state = 'in-set'; degree = degreeLabel(pc, hs.root);
           } else {
             state = 'out-of-set';
           }
         }
 
         const inRegion = !region || (f >= region.startFret && f <= region.endFret);
-
         this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), name, degree, isOpen: f === 0, state, inRegion });
       }
     }

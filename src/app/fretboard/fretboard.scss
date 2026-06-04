@@ -91,6 +91,26 @@
   opacity: 0.08;
 }
 
+// Voicing dots (chord shape finder)
+.voicing-dot {
+  fill: #1a6e52;
+  stroke: #3ad0a8;
+  stroke-width: 1;
+
+  &.voicing-root {
+    fill: #b86820;
+    stroke: #e8952e;
+    stroke-width: 1.5;
+  }
+}
+
+.muted-marker {
+  fill: #666;
+  font-size: 12px;
+  font-family: monospace;
+  pointer-events: none;
+}
+
 .note-text {
   fill: #dde8ff;
   font-size: 8px;

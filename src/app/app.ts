@@ -3,14 +3,16 @@ import { FretboardComponent, HighlightSet } from './fretboard/fretboard';
 import { RootSelectorComponent } from './controls/root-selector/root-selector';
 import { PitchSetSelectorComponent } from './controls/pitch-set-selector/pitch-set-selector';
 import { RegionSelectorComponent } from './controls/region-selector/region-selector';
+import { ChordFinderComponent, ChordQuery } from './query/chord-finder/chord-finder';
 import { PitchSetDef } from './core/pitch-set';
+import { findBestShape, Voicing } from './core/caged';
 import { computeRegions, Region } from './core/region';
 import { STANDARD_TUNING } from './core/tuning';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FretboardComponent, RootSelectorComponent, PitchSetSelectorComponent, RegionSelectorComponent],
+  imports: [FretboardComponent, RootSelectorComponent, PitchSetSelectorComponent, RegionSelectorComponent, ChordFinderComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -25,11 +27,14 @@ export class App {
   highlightSet: HighlightSet | null = null;
   regions: Region[] = [];
   activeRegion: Region | null = null;
+  activeVoicing: Voicing | null = null;
 
   onRootSelected(root: number | null): void {
     this.selectedRoot = root;
+    const prevId = this.activeRegion?.id ?? null;
     this.regions = root !== null ? computeRegions(root, STANDARD_TUNING) : [];
-    this.activeRegion = null; // reset when root changes
+    this.activeRegion = prevId ? (this.regions.find(r => r.id === prevId) ?? null) : null;
+    this.activeVoicing = null;
     this.syncHighlightSet();
   }
 
@@ -40,6 +45,15 @@ export class App {
 
   onRegionSelected(region: Region | null): void {
     this.activeRegion = region;
+  }
+
+  onChordFind(query: ChordQuery): void {
+    if (this.selectedRoot === null) return;
+    this.activeVoicing = findBestShape(this.selectedRoot, query.quality, query.fret, STANDARD_TUNING);
+  }
+
+  onChordClear(): void {
+    this.activeVoicing = null;
   }
 
   private syncHighlightSet(): void {

@@ -1,0 +1,18 @@
+<div class="chord-finder">
+  <span class="chord-root">{{ rootName }}</span>
+  <select class="quality-select" [value]="quality" (change)="quality = $any($event.target).value">
+    <option value="major">major</option>
+    <option value="minor">minor</option>
+  </select>
+  <span class="near-label">near fret</span>
+  <input
+    class="fret-input"
+    type="number"
+    min="0"
+    max="24"
+    [value]="targetFret"
+    (input)="onFretInput($event)"
+  />
+  <button class="find-btn" [disabled]="rootPc === null" (click)="onFind()">Find</button>
+  <button class="clear-btn" (click)="onClear()">✕</button>
+</div>
