@@ -1,4 +1,4 @@
-import { fretForPitchClass, NOTE_NAMES_SHARP } from './pitch';
+import { fretForPitchClass, NOTE_NAMES_COMMON } from './pitch';
 
 export interface VoicingPosition {
   string: number;  // 1–6
@@ -128,7 +128,7 @@ export function findBestShape(
       const dist = Math.abs(rootFret - targetFret);
       if (dist < bestDist) {
         bestDist = dist;
-        const rootName  = NOTE_NAMES_SHARP[rootPc];
+        const rootName  = NOTE_NAMES_COMMON[rootPc];
         const qualLabel = quality === 'major' ? '' : 'm';
         best = {
           shape: tmpl.id,

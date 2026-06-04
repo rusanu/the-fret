@@ -24,7 +24,11 @@
     color: #e0e0e0;
   }
 
-  &.accidental { font-size: 11px; }
+  &.dual {
+    font-size: 9px;
+    min-width: 44px;
+    letter-spacing: -0.02em;
+  }
 
   &.in-set {
     background: #1a5c8a;

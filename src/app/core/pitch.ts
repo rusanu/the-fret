@@ -1,7 +1,10 @@
 export type PitchClass = number; // 0–11
 
-export const NOTE_NAMES_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
-export const NOTE_NAMES_FLAT  = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+export const NOTE_NAMES_SHARP  = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+export const NOTE_NAMES_FLAT   = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+// Conventional mixed spelling: sharps for C#/F#, flats for Eb/Ab/Bb.
+// Used as the default display name throughout the UI.
+export const NOTE_NAMES_COMMON = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
 const PITCH_OF: Record<string, number> = {
   C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4,
@@ -21,12 +24,6 @@ export function fretForPitchClass(rootPc: number, stringNum: number, tuning: rea
   return (rootPc - PITCH_OF[tuning[6 - stringNum]] + 12) % 12;
 }
 
-export function noteNameAt(
-  stringNum: number,
-  fret: number,
-  tuning: readonly string[],
-  useFlats = false
-): string {
-  const pc = noteAt(stringNum, fret, tuning);
-  return useFlats ? NOTE_NAMES_FLAT[pc] : NOTE_NAMES_SHARP[pc];
+export function noteNameAt(stringNum: number, fret: number, tuning: readonly string[]): string {
+  return NOTE_NAMES_COMMON[noteAt(stringNum, fret, tuning)];
 }

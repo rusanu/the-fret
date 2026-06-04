@@ -9,7 +9,7 @@ import { PitchSetDef } from './core/pitch-set';
 import { findBestShape } from './core/caged';
 import { pitchesInSet } from './core/pitch-set';
 import { computeRegions, Region } from './core/region';
-import { NOTE_NAMES_SHARP } from './core/pitch';
+import { NOTE_NAMES_COMMON } from './core/pitch';
 import { STANDARD_TUNING } from './core/tuning';
 
 @Component({
@@ -65,7 +65,7 @@ export class App {
     if (this.selectedRoot === null) return;
     const voicing = findBestShape(this.selectedRoot, query.quality, query.fret, STANDARD_TUNING);
     if (!voicing) return;
-    const rootName  = NOTE_NAMES_SHARP[this.selectedRoot];
+    const rootName  = NOTE_NAMES_COMMON[this.selectedRoot];
     const qualLabel = query.quality === 'major' ? '' : 'm';
     this.panels = [...this.panels, {
       id: `panel-${++this.nextId}`,
@@ -81,7 +81,7 @@ export class App {
 
   onSaveMain(): void {
     if (!this.highlightSet) return;
-    const rootName   = NOTE_NAMES_SHARP[this.highlightSet.root];
+    const rootName   = NOTE_NAMES_COMMON[this.highlightSet.root];
     const scaleName  = this.selectedSetDef?.name ?? '';
     const regionName = this.activeRegion?.name ?? 'All neck';
     this.panels = [...this.panels, {

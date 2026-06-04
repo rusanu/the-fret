@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NOTE_NAMES_SHARP } from '../../core/pitch';
+import { NOTE_NAMES_COMMON } from '../../core/pitch';
 
 export interface ChordQuery {
   quality: 'major' | 'minor';
@@ -21,7 +21,7 @@ export class ChordFinderComponent {
   targetFret = 5;
 
   get rootName(): string {
-    return this.rootPc !== null ? NOTE_NAMES_SHARP[this.rootPc] : '—';
+    return this.rootPc !== null ? NOTE_NAMES_COMMON[this.rootPc] : '—';
   }
 
   onFretInput(event: Event): void {

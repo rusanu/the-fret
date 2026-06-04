@@ -4,7 +4,7 @@
       class="root-btn"
       [class.active]="selectedPc === root.pc"
       [class.in-set]="selectedPc !== root.pc && inSetPcs.has(root.pc)"
-      [class.accidental]="root.name.length > 1"
+      [class.dual]="root.dual"
       (click)="select(root.pc)"
     >{{ root.name }}</button>
   }
