@@ -9,6 +9,13 @@
         <option [value]="t.name">{{ t.name }}</option>
       }
     </select>
+    @if (isCagedCompatible) {
+      <select class="shape-select" [value]="selectedShape" (change)="onShapeChange($event)">
+        @for (s of shapeOptions; track s.id) {
+          <option [value]="s.id">{{ s.label }}</option>
+        }
+      </select>
+    }
     <span class="near-label">near fret</span>
     <input
       class="fret-input"

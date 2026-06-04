@@ -8,6 +8,7 @@ export interface ChordQuery {
   intervals: readonly number[];
   chordName: string;
   fret: number;
+  shapeId: string; // 'auto' or specific CAGED shape id (E/A/D/C/G)
 }
 
 @Component({
@@ -21,22 +22,36 @@ export class ChordFinderComponent {
   @Output() findChord = new EventEmitter<ChordQuery>();
 
   readonly chordTypes: PitchSetDef[] = PITCH_SET_LIBRARY.filter(p => p.category === 'arpeggio') as PitchSetDef[];
+  readonly shapeOptions = [
+    { id: 'auto', label: 'Auto' },
+    { id: 'E', label: 'E' }, { id: 'A', label: 'A' },
+    { id: 'D', label: 'D' }, { id: 'C', label: 'C' }, { id: 'G', label: 'G' },
+  ];
 
   selectedRoot: number | null = null;
-  selectedType: PitchSetDef = this.chordTypes[0]; // default: Power (5)
+  selectedType: PitchSetDef = this.chordTypes[0];
+  selectedShape = 'auto';
   targetFret = 5;
+
+  // Shape selector only makes sense for chords that map to a CAGED shape (triads+)
+  get isCagedCompatible(): boolean {
+    return this.selectedType.intervals.length > 2;
+  }
 
   get rootName(): string {
     return this.selectedRoot !== null ? NOTE_NAMES_COMMON[this.selectedRoot] : '—';
   }
 
-  onRootSelected(pc: number | null): void {
-    this.selectedRoot = pc;
-  }
+  onRootSelected(pc: number | null): void { this.selectedRoot = pc; }
 
   onTypeChange(event: Event): void {
     const name = (event.target as HTMLSelectElement).value;
     this.selectedType = this.chordTypes.find(t => t.name === name) ?? this.chordTypes[0];
+    if (!this.isCagedCompatible) this.selectedShape = 'auto';
+  }
+
+  onShapeChange(event: Event): void {
+    this.selectedShape = (event.target as HTMLSelectElement).value;
   }
 
   onFretInput(event: Event): void {
@@ -51,6 +66,7 @@ export class ChordFinderComponent {
       intervals: this.selectedType.intervals,
       chordName: this.selectedType.name,
       fret: this.targetFret,
+      shapeId: this.selectedShape,
     });
   }
 }

@@ -144,9 +144,11 @@ export function findBestShape(
   chordName: string,
   targetFret: number,
   tuning: readonly string[],
+  shapeId?: string, // when set (and not 'auto'), restrict to that CAGED shape
 ): Voicing | null {
-  const shapeQ   = deriveShapeQuality(intervals);
-  const templates = SHAPE_TEMPLATES.filter(t => t.quality === shapeQ);
+  const shapeQ = deriveShapeQuality(intervals);
+  let templates = SHAPE_TEMPLATES.filter(t => t.quality === shapeQ);
+  if (shapeId && shapeId !== 'auto') templates = templates.filter(t => t.id === shapeId);
   let best: Voicing | null = null;
   let bestDist = Infinity;
   let bestOpen = -1;

@@ -78,7 +78,8 @@ export class App {
   }
 
   onChordFind(query: ChordQuery): void {
-    const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, this.selectedTuning);
+    const shapeId = query.shapeId !== 'auto' ? query.shapeId : undefined;
+    const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, this.selectedTuning, shapeId);
     if (!voicing) return;
     const rootName = NOTE_NAMES_COMMON[query.rootPc];
     const shapeTag = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
