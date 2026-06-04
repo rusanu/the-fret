@@ -1,0 +1,17 @@
+<div class="panel">
+  <div class="panel-header">
+    <span class="panel-type-badge" [class.badge-voicing]="panel.type === 'voicing'">
+      {{ panel.type === 'voicing' ? 'chord' : 'snapshot' }}
+    </span>
+    <span class="panel-title">{{ panel.title }}</span>
+    <button class="panel-close" (click)="close.emit(panel.id)" aria-label="Close">✕</button>
+  </div>
+  <app-fretboard
+    [highlightSet]="panel.highlightSet"
+    [activeRegion]="panel.activeRegion"
+    [voicing]="panel.voicing"
+    [showNoteLabels]="panel.showNoteLabels"
+    [showDegrees]="panel.showDegrees"
+    [dimUnset]="true"
+  />
+</div>

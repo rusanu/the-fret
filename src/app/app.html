@@ -23,10 +23,14 @@
   <div class="control-group">
     <span class="control-label">View</span>
     <div class="opt-btns">
-      <button class="opt-btn" [class.active]="showNoteLabels" (click)="showNoteLabels = !showNoteLabels">Labels</button>
+      <button class="opt-btn" [class.active]="showNoteLabels" (click)="showNoteLabels = !showNoteLabels">Notes</button>
       <button class="opt-btn" [class.active]="showDegrees" [disabled]="!highlightSet" (click)="showDegrees = !showDegrees">Degrees</button>
       <button class="opt-btn" [class.active]="dimUnset" [disabled]="!highlightSet" (click)="dimUnset = !dimUnset">Dim unset</button>
     </div>
+  </div>
+  <div class="control-group control-group--push-right">
+    <span class="control-label">Snapshot</span>
+    <button class="save-btn" [disabled]="!canSave" (click)="onSaveMain()">Save view</button>
   </div>
 </div>
 
@@ -35,20 +39,24 @@
   <app-chord-finder
     [rootPc]="selectedRoot"
     (findChord)="onChordFind($event)"
-    (clearChord)="onChordClear()"
+    (clearChord)="$event"
   />
-  @if (activeVoicing) {
-    <span class="voicing-label">{{ activeVoicing.label }}</span>
-  }
 </div>
 
 <main>
   <app-fretboard
-    [highlightSet]="activeVoicing ? null : highlightSet"
+    [highlightSet]="highlightSet"
     [activeRegion]="activeRegion"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
     [dimUnset]="dimUnset"
-    [voicing]="activeVoicing"
   />
 </main>
+
+@if (panels.length > 0) {
+  <section class="panels-section">
+    @for (panel of panels; track panel.id) {
+      <app-fretboard-panel [panel]="panel" (close)="onRemovePanel($event)" />
+    }
+  </section>
+}
