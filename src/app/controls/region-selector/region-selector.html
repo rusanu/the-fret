@@ -1,0 +1,29 @@
+<select
+  #selectEl
+  class="region-select"
+  (change)="onChange($event)"
+  [disabled]="regions.length === 0"
+>
+  <option value="">All Neck</option>
+  @if (pentatonic.length > 0) {
+    <optgroup label="Pentatonic Boxes">
+      @for (r of pentatonic; track r.id) {
+        <option [value]="r.id">{{ r.name }}</option>
+      }
+    </optgroup>
+  }
+  @if (caged.length > 0) {
+    <optgroup label="CAGED">
+      @for (r of caged; track r.id) {
+        <option [value]="r.id">{{ r.name }}</option>
+      }
+    </optgroup>
+  }
+  @if (blues.length > 0) {
+    <optgroup label="Blues Boxes">
+      @for (r of blues; track r.id) {
+        <option [value]="r.id">{{ r.name }}</option>
+      }
+    </optgroup>
+  }
+</select>

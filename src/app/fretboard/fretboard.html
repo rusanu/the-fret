@@ -9,12 +9,21 @@
     role="img"
     aria-label="Guitar fretboard"
   >
-    <!-- Neck background (fretted area, from nut to right edge) -->
+    <!-- Neck background -->
     <rect
       [attr.x]="neckX" [attr.y]="neckY"
       [attr.width]="neckW" [attr.height]="neckH"
       class="neck-bg"
     />
+
+    <!-- Region bracket overlay (behind notes, on top of neck background) -->
+    @if (activeRegion) {
+      <rect
+        [attr.x]="regionBracketX" [attr.y]="neckY"
+        [attr.width]="regionBracketW" [attr.height]="neckH"
+        class="region-bracket"
+      />
+    }
 
     <!-- Fret inlay dots -->
     @for (dot of inlayDots; track dot.id) {
@@ -31,7 +40,7 @@
       />
     }
 
-    <!-- String lines (span open area + fretted area) -->
+    <!-- String lines -->
     @for (str of strings; track str.num) {
       <line
         [attr.x1]="stringX1" [attr.y1]="str.y"
@@ -51,7 +60,7 @@
       <text [attr.x]="lbl.x" y="14" class="fret-label" text-anchor="middle">{{ lbl.label }}</text>
     }
 
-    <!-- Note dots — always rendered; state drives color; dim-unset CSS handles opacity -->
+    <!-- Note dots — state + region-out drive color/opacity via CSS -->
     @for (note of notes; track note.id) {
       <circle
         [attr.cx]="note.cx" [attr.cy]="note.cy" [attr.r]="DOT_R"
@@ -59,6 +68,7 @@
         [class.state-root]="note.state === 'root'"
         [class.state-in-set]="note.state === 'in-set'"
         [class.state-out-of-set]="note.state === 'out-of-set'"
+        [class.region-out]="activeRegion && !note.inRegion"
         class="note-dot"
       />
       @if (shouldShowLabel(note)) {

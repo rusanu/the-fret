@@ -16,6 +16,11 @@ export function noteAt(stringNum: number, fret: number, tuning: readonly string[
   return (PITCH_OF[tuning[6 - stringNum]] + fret) % 12;
 }
 
+// Lowest fret (0–11) on stringNum where the given pitch class sounds
+export function fretForPitchClass(rootPc: number, stringNum: number, tuning: readonly string[]): number {
+  return (rootPc - PITCH_OF[tuning[6 - stringNum]] + 12) % 12;
+}
+
 export function noteNameAt(
   stringNum: number,
   fret: number,

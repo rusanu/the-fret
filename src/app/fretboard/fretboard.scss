@@ -16,6 +16,12 @@
   fill: #1c1206;
 }
 
+.region-bracket {
+  fill: rgba(200, 168, 75, 0.07);
+  stroke: rgba(200, 168, 75, 0.28);
+  stroke-width: 1.5;
+}
+
 .fret-wire {
   stroke: #5a5a5a;
   stroke-width: 1.5;
@@ -46,7 +52,7 @@
   font-family: monospace;
 }
 
-// Note dot — base style (no set selected)
+// Note dot — base (no set selected)
 .note-dot {
   fill: #1a2e50;
   stroke: #2d5080;
@@ -59,22 +65,28 @@
     stroke-dasharray: 2 2;
   }
 
-  // Root note — gold/orange
+  // Root — gold
   &.state-root {
     fill: #b86820;
     stroke: #e8952e;
     stroke-width: 1.5;
   }
 
-  // In-set (non-root) — brighter blue
+  // In-set (non-root) — bright blue
   &.state-in-set {
     fill: #1a5c8a;
     stroke: #3a9fd0;
     stroke-width: 1;
   }
+
+  // In-set or root, but outside the active region — fade significantly
+  &.state-root.region-out,
+  &.state-in-set.region-out {
+    opacity: 0.22;
+  }
 }
 
-// Dim out-of-set notes when a set is active (toggled via CSS class on the SVG root)
+// Dim out-of-set notes when a set is active (class toggled on the SVG root)
 .fretboard.dim-unset .note-dot.state-out-of-set {
   opacity: 0.08;
 }

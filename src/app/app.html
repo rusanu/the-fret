@@ -13,6 +13,10 @@
     <app-pitch-set-selector (setSelected)="onSetSelected($event)" />
   </div>
   <div class="control-group">
+    <span class="control-label">Region</span>
+    <app-region-selector [regions]="regions" (regionSelected)="onRegionSelected($event)" />
+  </div>
+  <div class="control-group">
     <span class="control-label">View</span>
     <div class="opt-btns">
       <button class="opt-btn" [class.active]="showNoteLabels" (click)="showNoteLabels = !showNoteLabels">Labels</button>
@@ -25,6 +29,7 @@
 <main>
   <app-fretboard
     [highlightSet]="highlightSet"
+    [activeRegion]="activeRegion"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
     [dimUnset]="dimUnset"

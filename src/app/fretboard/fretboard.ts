@@ -1,6 +1,7 @@
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { noteAt, noteNameAt } from '../core/pitch';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
+import { Region } from '../core/region';
 import { STANDARD_TUNING } from '../core/tuning';
 
 export type NoteState = 'root' | 'in-set' | 'out-of-set' | 'normal';
@@ -18,6 +19,7 @@ interface NoteCell {
   degree: string;
   isOpen: boolean;
   state: NoteState;
+  inRegion: boolean;
 }
 
 interface FretWire {
@@ -50,6 +52,7 @@ export class FretboardComponent implements OnInit, OnChanges {
   @Input() showDegrees = false;
   @Input() dimUnset = true;
   @Input() highlightSet: HighlightSet | null = null;
+  @Input() activeRegion: Region | null = null;
 
   // Layout constants (px)
   private readonly LW = 32;
@@ -69,6 +72,8 @@ export class FretboardComponent implements OnInit, OnChanges {
   neckH = 0;
   stringX1 = 0;
   stringX2 = 0;
+  regionBracketX = 0;
+  regionBracketW = 0;
 
   strings: StringInfo[] = [];
   fretWires: FretWire[] = [];
@@ -85,13 +90,14 @@ export class FretboardComponent implements OnInit, OnChanges {
   ngOnInit(): void { this.rebuild(); }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes) {
+    if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes || 'activeRegion' in changes) {
       this.rebuild();
     }
   }
 
   shouldShowLabel(note: NoteCell): boolean {
     if (note.state === 'out-of-set') return false;
+    if (this.activeRegion && !note.inRegion) return false;
     if (note.state === 'root' || note.state === 'in-set') return true;
     return this.showNoteLabels;
   }
@@ -119,6 +125,12 @@ export class FretboardComponent implements OnInit, OnChanges {
 
     this.stringX1 = this.LW;
     this.stringX2 = this.LW + (fc + 1) * this.FW;
+
+    // Region bracket: left edge of startFret column → right edge of endFret column
+    if (this.activeRegion) {
+      this.regionBracketX = this.LW + this.activeRegion.startFret * this.FW;
+      this.regionBracketW = (this.activeRegion.endFret - this.activeRegion.startFret + 1) * this.FW;
+    }
 
     this.strings = [1, 2, 3, 4, 5, 6].map(s => ({
       num: s,
@@ -155,6 +167,7 @@ export class FretboardComponent implements OnInit, OnChanges {
 
     const hs = this.highlightSet;
     const setNotes = hs ? pitchesInSet(hs.root, hs.intervals) : null;
+    const region = this.activeRegion;
 
     this.notes = [];
     for (let s = 1; s <= 6; s++) {
@@ -177,7 +190,9 @@ export class FretboardComponent implements OnInit, OnChanges {
           }
         }
 
-        this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), name, degree, isOpen: f === 0, state });
+        const inRegion = !region || (f >= region.startFret && f <= region.endFret);
+
+        this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), name, degree, isOpen: f === 0, state, inRegion });
       }
     }
   }
