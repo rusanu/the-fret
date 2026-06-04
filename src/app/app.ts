@@ -25,8 +25,10 @@ export class App {
   selectedRoot: number | null = null;
   selectedSetDef: PitchSetDef | null = null;
 
-  showNoteLabels = false;
-  showDegrees = false;
+  labelMode: 'none' | 'notes' | 'degrees' = 'none';
+
+  get showNoteLabels(): boolean { return this.labelMode !== 'none'; }
+  get showDegrees():    boolean { return this.labelMode === 'degrees'; }
 
   highlightSet: HighlightSet | null = null;
   regions: Region[] = [];
