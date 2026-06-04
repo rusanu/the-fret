@@ -28,6 +28,7 @@ interface VoicingDot {
   cx: number;
   cy: number;
   tone: string;
+  noteName: string;
   isRoot: boolean;
 }
 
@@ -170,6 +171,7 @@ export class FretboardComponent implements OnInit, OnChanges {
         cx: this.nx(p.fret),
         cy: this.ny(p.string),
         tone: p.tone,
+        noteName: noteNameAt(p.string, p.fret, this.tuning),
         isRoot: p.tone === '1',
       }));
       this.mutedMarkers = this.voicing.mutedStrings.map(s => ({

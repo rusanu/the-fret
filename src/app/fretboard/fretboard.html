@@ -90,11 +90,13 @@
           [class.voicing-root]="dot.isRoot"
           class="voicing-dot"
         />
-        <text
-          [attr.x]="dot.cx" [attr.y]="dot.cy + 3.5"
-          class="note-text"
-          text-anchor="middle"
-        >{{ dot.tone }}</text>
+        @if (showNoteLabels) {
+          <text
+            [attr.x]="dot.cx" [attr.y]="dot.cy + 3.5"
+            class="note-text"
+            text-anchor="middle"
+          >{{ showDegrees ? dot.tone : dot.noteName }}</text>
+        }
       }
       @for (m of mutedMarkers; track m.id) {
         <text
