@@ -1,5 +1,26 @@
 import { fretForPitchClass, NOTE_NAMES_COMMON } from './pitch';
 
+// Semitone interval above chord root for each tone label
+const TONE_SEMITONES: Record<string, number> = {
+  '1': 0, 'b2': 1, '2': 2, 'b3': 3, '3': 4, '4': 5,
+  'b5': 6, '5': 7, 'b6': 8, '6': 9, 'b7': 10, '7': 11,
+};
+
+// Find the fret on `stringNum` that sounds `targetPc`, picking the occurrence
+// closest to `guideFret` (the fret the standard-tuning template would suggest).
+function tuningAwareFret(
+  targetPc: number,
+  stringNum: number,
+  guideFret: number,
+  tuning: readonly string[],
+): number {
+  const base = fretForPitchClass(targetPc, stringNum, tuning); // lowest fret (0–11)
+  // Shift up by octaves until we're close to guideFret
+  let fret = base;
+  while (fret < guideFret - 5 && fret + 12 <= 24) fret += 12;
+  return fret;
+}
+
 export interface VoicingPosition {
   string: number;  // 1–6
   fret: number;
@@ -157,11 +178,13 @@ export function findBestShape(
     const base = fretForPitchClass(rootPc, tmpl.rootString, tuning);
 
     for (const rootFret of [base, base + 12]) {
-      const positions: VoicingPosition[] = tmpl.fingers.map(f => ({
-        string: f.string,
-        fret: rootFret + f.offset,
-        tone: f.tone,
-      }));
+      const positions: VoicingPosition[] = tmpl.fingers.map(f => {
+        const toneInterval = TONE_SEMITONES[f.tone] ?? 0;
+        const targetPc    = (rootPc + toneInterval) % 12;
+        const guideFret   = rootFret + f.offset; // standard-tuning guide
+        const fret        = tuningAwareFret(targetPc, f.string, guideFret, tuning);
+        return { string: f.string, fret, tone: f.tone };
+      });
 
       if (positions.some(p => p.fret < 0 || p.fret > 24)) continue;
 
