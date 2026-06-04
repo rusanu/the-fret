@@ -34,15 +34,17 @@ Items discovered during development, not yet scheduled into an iteration.
 
 - **Chord progressions with animation** — Show a named progression (e.g. Am I–VI–IV–V) as a
   timed animated sequence on the fretboard, one chord per bar at a configurable BPM.
-  Depends on: Audio (above) + Iteration 4 (voicing engine / CAGED chord shapes).
+  Purely visual — no audio required. Depends only on Iteration 4 (voicing engine / CAGED chord
+  shapes), which provides the fingering positions for each chord.
   Key design decisions:
   - Progression input: Roman-numeral picker (I ii iii IV V vi vii°) relative to the selected key,
     or a free-form chord sequence (Am → F → C → G).
-  - Animation: a "playhead" highlights the active chord's voicing dots on the neck while the others
-    dim. Timing driven by `AudioContext.currentTime` scheduling (same as audio engine).
+  - Animation: a "playhead" cycles through chords at the set BPM using `setInterval` or
+    `requestAnimationFrame`; active chord's voicing dots highlight on the neck, others dim.
   - BPM control: tap-tempo or numeric input; default 80 BPM, 1 chord per bar.
   - Region awareness: show each chord in the selected box/region (e.g. "all in Box 1") or
     in the closest CAGED shape to the previous chord (voice-leading mode).
+  - Audio can be layered on top later once the audio engine exists, but is not a blocker.
 
 ---
 
