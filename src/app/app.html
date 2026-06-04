@@ -55,7 +55,7 @@
 
 <div class="chord-bar">
   <span class="control-label">Chord finder</span>
-  <app-chord-finder (findChord)="onChordFind($event)" />
+  <app-chord-finder [noResult]="chordNoResult" (findChord)="onChordFind($event)" />
 </div>
 
 @if (panels.length > 0) {

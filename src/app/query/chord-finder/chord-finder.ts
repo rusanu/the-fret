@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RootSelectorComponent } from '../../controls/root-selector/root-selector';
 import { NOTE_NAMES_COMMON } from '../../core/pitch';
 import { PITCH_SET_LIBRARY, PitchSetDef } from '../../core/pitch-set';
@@ -19,6 +19,7 @@ export interface ChordQuery {
   styleUrl: './chord-finder.scss'
 })
 export class ChordFinderComponent {
+  @Input() noResult = false;
   @Output() findChord = new EventEmitter<ChordQuery>();
 
   readonly chordTypes: PitchSetDef[] = PITCH_SET_LIBRARY.filter(p => p.category === 'arpeggio') as PitchSetDef[];

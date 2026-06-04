@@ -37,6 +37,7 @@ export class App {
   activeRegion: Region | null = null;
 
   chordHighlightPcs: Set<number> | null = null;
+  chordNoResult = false;
   panels: FretboardPanel[] = [];
   private nextId = 0;
 
@@ -86,7 +87,8 @@ export class App {
   onChordFind(query: ChordQuery): void {
     const shapeId = query.shapeId !== 'auto' ? query.shapeId : undefined;
     const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, this.selectedTuning, shapeId);
-    if (!voicing) return;
+    if (!voicing) { this.chordNoResult = true; return; }
+    this.chordNoResult = false;
     const rootName = NOTE_NAMES_COMMON[query.rootPc];
     const shapeTag = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
     this.panels = [{

@@ -29,5 +29,8 @@
       />
     }
     <button class="find-btn" [disabled]="selectedRoot === null" (click)="onFind()">Find</button>
+    @if (noResult) {
+      <span class="no-result">No voicing found for this shape / tuning combination</span>
+    }
   </div>
 </div>
