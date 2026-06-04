@@ -1,0 +1,23 @@
+:host { display: block; }
+
+.set-select {
+  background: #1a1a1a;
+  color: #bbb;
+  border: 1px solid #333;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-size: 13px;
+  font-family: system-ui, sans-serif;
+  cursor: pointer;
+  min-width: 190px;
+
+  &:focus {
+    outline: 1px solid #c8a84b;
+    border-color: #c8a84b;
+  }
+
+  option, optgroup {
+    background: #1a1a1a;
+    color: #bbb;
+  }
+}

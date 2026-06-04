@@ -1,0 +1,18 @@
+<select class="set-select" (change)="onChange($event)">
+  <option value="">— none —</option>
+  <optgroup label="Scales">
+    @for (entry of scales; track entry.name) {
+      <option [value]="entry.name">{{ entry.name }}</option>
+    }
+  </optgroup>
+  <optgroup label="Modes">
+    @for (entry of modes; track entry.name) {
+      <option [value]="entry.name">{{ entry.name }}</option>
+    }
+  </optgroup>
+  <optgroup label="Arpeggios">
+    @for (entry of arpeggios; track entry.name) {
+      <option [value]="entry.name">{{ entry.name }}</option>
+    }
+  </optgroup>
+</select>

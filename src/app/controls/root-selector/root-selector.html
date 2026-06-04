@@ -1,0 +1,10 @@
+<div class="root-selector">
+  @for (root of roots; track root.pc) {
+    <button
+      class="root-btn"
+      [class.active]="selectedPc === root.pc"
+      [class.accidental]="root.name.length > 1"
+      (click)="select(root.pc)"
+    >{{ root.name }}</button>
+  }
+</div>

@@ -46,9 +46,10 @@
   font-family: monospace;
 }
 
+// Note dot — base style (no set selected)
 .note-dot {
-  fill: #1e3a6e;
-  stroke: #3a6db5;
+  fill: #1a2e50;
+  stroke: #2d5080;
   stroke-width: 0.75;
 
   &.note-open {
@@ -57,6 +58,25 @@
     stroke-width: 1.5;
     stroke-dasharray: 2 2;
   }
+
+  // Root note — gold/orange
+  &.state-root {
+    fill: #b86820;
+    stroke: #e8952e;
+    stroke-width: 1.5;
+  }
+
+  // In-set (non-root) — brighter blue
+  &.state-in-set {
+    fill: #1a5c8a;
+    stroke: #3a9fd0;
+    stroke-width: 1;
+  }
+}
+
+// Dim out-of-set notes when a set is active (toggled via CSS class on the SVG root)
+.fretboard.dim-unset .note-dot.state-out-of-set {
+  opacity: 0.08;
 }
 
 .note-text {

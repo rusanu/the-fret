@@ -1,6 +1,7 @@
 <div class="fretboard-wrap">
   <svg
     class="fretboard"
+    [class.dim-unset]="dimUnset && !!highlightSet"
     [attr.viewBox]="viewBox"
     [attr.width]="svgWidth"
     [attr.height]="svgHeight"
@@ -50,19 +51,22 @@
       <text [attr.x]="lbl.x" y="14" class="fret-label" text-anchor="middle">{{ lbl.label }}</text>
     }
 
-    <!-- Note dots and names -->
-    @if (showNoteLabels) {
-      @for (note of notes; track note.id) {
-        <circle
-          [attr.cx]="note.cx" [attr.cy]="note.cy" [attr.r]="DOT_R"
-          [class.note-open]="note.isOpen"
-          class="note-dot"
-        />
+    <!-- Note dots — always rendered; state drives color; dim-unset CSS handles opacity -->
+    @for (note of notes; track note.id) {
+      <circle
+        [attr.cx]="note.cx" [attr.cy]="note.cy" [attr.r]="DOT_R"
+        [class.note-open]="note.isOpen"
+        [class.state-root]="note.state === 'root'"
+        [class.state-in-set]="note.state === 'in-set'"
+        [class.state-out-of-set]="note.state === 'out-of-set'"
+        class="note-dot"
+      />
+      @if (shouldShowLabel(note)) {
         <text
           [attr.x]="note.cx" [attr.y]="note.cy + 3.5"
           class="note-text"
           text-anchor="middle"
-        >{{ note.name }}</text>
+        >{{ labelText(note) }}</text>
       }
     }
   </svg>

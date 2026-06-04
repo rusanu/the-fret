@@ -3,6 +3,30 @@
   <p>Interactive guitar fretboard reference</p>
 </header>
 
+<div class="controls-bar">
+  <div class="control-group">
+    <span class="control-label">Root</span>
+    <app-root-selector (rootSelected)="onRootSelected($event)" />
+  </div>
+  <div class="control-group">
+    <span class="control-label">Scale / Arpeggio</span>
+    <app-pitch-set-selector (setSelected)="onSetSelected($event)" />
+  </div>
+  <div class="control-group">
+    <span class="control-label">View</span>
+    <div class="opt-btns">
+      <button class="opt-btn" [class.active]="showNoteLabels" (click)="showNoteLabels = !showNoteLabels">Labels</button>
+      <button class="opt-btn" [class.active]="showDegrees" [disabled]="!highlightSet" (click)="showDegrees = !showDegrees">Degrees</button>
+      <button class="opt-btn" [class.active]="dimUnset" [disabled]="!highlightSet" (click)="dimUnset = !dimUnset">Dim unset</button>
+    </div>
+  </div>
+</div>
+
 <main>
-  <app-fretboard [fretCount]="24" [showNoteLabels]="true" />
+  <app-fretboard
+    [highlightSet]="highlightSet"
+    [showNoteLabels]="showNoteLabels"
+    [showDegrees]="showDegrees"
+    [dimUnset]="dimUnset"
+  />
 </main>
