@@ -4,15 +4,6 @@ Items discovered during development, not yet scheduled into an iteration.
 
 ---
 
-## UX / Controls
-
-- **Rename "Labels" toggle to "Notes" or "Pitch"** — The current label is ambiguous (it could
-  refer to any text label). "Notes" is clearer: it means "show the pitch name on each dot."
-  Change is a one-word edit in `app.html`; `showNoteLabels` property name in the component
-  can stay as-is (it's internal).
-
----
-
 ## v.next — Major Features (separate milestone, not iteratively addable)
 
 - **Audio / Sound emission** — Play individual notes, chords, and scale runs through the browser.
