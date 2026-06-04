@@ -188,6 +188,13 @@ export function findBestShape(
 
       if (positions.some(p => p.fret < 0 || p.fret > 24)) continue;
 
+      // Reject unplayable stretches: fretted (non-open) notes must span ≤ 4 frets
+      const frettedFrets = positions.filter(p => p.fret > 0).map(p => p.fret);
+      if (frettedFrets.length > 1) {
+        const span = Math.max(...frettedFrets) - Math.min(...frettedFrets);
+        if (span > 4) continue;
+      }
+
       const dist  = Math.abs(rootFret - targetFret);
       const opens = openStringCount(positions);
 
