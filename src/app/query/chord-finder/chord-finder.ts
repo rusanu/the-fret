@@ -65,7 +65,7 @@ export class ChordFinderComponent {
       rootPc: this.selectedRoot,
       intervals: this.selectedType.intervals,
       chordName: this.selectedType.name,
-      fret: this.targetFret,
+      fret: this.selectedShape === 'auto' ? this.targetFret : 0,
       shapeId: this.selectedShape,
     });
   }

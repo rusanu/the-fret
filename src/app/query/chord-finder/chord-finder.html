@@ -17,15 +17,17 @@
         }
       </select>
     }
-    <span class="near-label">near fret</span>
-    <input
-      class="fret-input"
-      type="number"
-      min="0"
-      max="24"
-      [value]="targetFret"
-      (input)="onFretInput($event)"
-    />
+    @if (selectedShape === 'auto') {
+      <span class="near-label">near fret</span>
+      <input
+        class="fret-input"
+        type="number"
+        min="0"
+        max="24"
+        [value]="targetFret"
+        (input)="onFretInput($event)"
+      />
+    }
     <button class="find-btn" [disabled]="selectedRoot === null" (click)="onFind()">Find</button>
   </div>
 </div>
