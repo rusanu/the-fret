@@ -10,7 +10,7 @@ import { PitchSetDef, pitchesInSet } from './core/pitch-set';
 import { findBestShape } from './core/caged';
 import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_COMMON } from './core/pitch';
-import { Tuning, STANDARD_TUNING } from './core/tuning';
+import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
 
 @Component({
   selector: 'app-root',
@@ -39,6 +39,14 @@ export class App {
   private nextId = 0;
 
   private static readonly CAGED_SHAPES = new Set(['C', 'A', 'G', 'E', 'D']);
+
+  // Returns " [Drop D]" etc. when tuning is non-standard; empty string for standard.
+  private tuningTag(): string {
+    if (this.selectedTuning === STANDARD_TUNING) return '';
+    const preset = TUNING_PRESETS.find(p => p.strings === this.selectedTuning);
+    const shortName = preset ? preset.name.split(' — ')[0] : 'Custom';
+    return ` [${shortName}]`;
+  }
 
   get inSetPcs(): Set<number> {
     if (!this.highlightSet) return new Set();
@@ -76,7 +84,7 @@ export class App {
     const shapeTag = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
     this.panels = [{
       id: `panel-${++this.nextId}`,
-      title: `${rootName} ${query.chordName} near fret ${query.fret}${shapeTag}`,
+      title: `${rootName} ${query.chordName} near fret ${query.fret}${shapeTag}${this.tuningTag()}`,
       type: 'voicing',
       voicing,
       highlightSet: null,
@@ -94,7 +102,7 @@ export class App {
     const regionName = this.activeRegion?.name ?? 'All neck';
     this.panels = [{
       id: `panel-${++this.nextId}`,
-      title: `${rootName} ${scaleName} · ${regionName}`,
+      title: `${rootName} ${scaleName} · ${regionName}${this.tuningTag()}`,
       type: 'snapshot',
       voicing: null,
       highlightSet: { ...this.highlightSet },
