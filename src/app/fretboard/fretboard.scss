@@ -1,0 +1,68 @@
+:host {
+  display: block;
+}
+
+.fretboard-wrap {
+  overflow-x: auto;
+  width: 100%;
+  padding: 0.5rem 0;
+}
+
+.fretboard {
+  display: block;
+}
+
+.neck-bg {
+  fill: #1c1206;
+}
+
+.fret-wire {
+  stroke: #5a5a5a;
+  stroke-width: 1.5;
+
+  &.nut {
+    stroke: #d4c8a4;
+    stroke-width: 5;
+  }
+}
+
+.string-line {
+  stroke: #c8a84b;
+}
+
+.inlay-dot {
+  fill: #3a2510;
+}
+
+.fret-label {
+  fill: #888;
+  font-size: 10px;
+  font-family: monospace;
+}
+
+.string-label {
+  fill: #777;
+  font-size: 10px;
+  font-family: monospace;
+}
+
+.note-dot {
+  fill: #1e3a6e;
+  stroke: #3a6db5;
+  stroke-width: 0.75;
+
+  &.note-open {
+    fill: #0d1f3c;
+    stroke: #3a6db5;
+    stroke-width: 1.5;
+    stroke-dasharray: 2 2;
+  }
+}
+
+.note-text {
+  fill: #dde8ff;
+  font-size: 8px;
+  font-family: monospace;
+  pointer-events: none;
+  user-select: none;
+}

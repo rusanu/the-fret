@@ -1,0 +1,69 @@
+<div class="fretboard-wrap">
+  <svg
+    class="fretboard"
+    [attr.viewBox]="viewBox"
+    [attr.width]="svgWidth"
+    [attr.height]="svgHeight"
+    xmlns="http://www.w3.org/2000/svg"
+    role="img"
+    aria-label="Guitar fretboard"
+  >
+    <!-- Neck background (fretted area, from nut to right edge) -->
+    <rect
+      [attr.x]="neckX" [attr.y]="neckY"
+      [attr.width]="neckW" [attr.height]="neckH"
+      class="neck-bg"
+    />
+
+    <!-- Fret inlay dots -->
+    @for (dot of inlayDots; track dot.id) {
+      <circle [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="4" class="inlay-dot" />
+    }
+
+    <!-- Fret wires (n=0 is nut, n>0 are regular fret wires) -->
+    @for (wire of fretWires; track wire.x) {
+      <line
+        [attr.x1]="wire.x" [attr.y1]="neckY"
+        [attr.x2]="wire.x" [attr.y2]="neckY + neckH"
+        [class.nut]="wire.isNut"
+        class="fret-wire"
+      />
+    }
+
+    <!-- String lines (span open area + fretted area) -->
+    @for (str of strings; track str.num) {
+      <line
+        [attr.x1]="stringX1" [attr.y1]="str.y"
+        [attr.x2]="stringX2" [attr.y2]="str.y"
+        [attr.stroke-width]="str.strokeWidth"
+        class="string-line"
+      />
+    }
+
+    <!-- String number labels -->
+    @for (lbl of stringLabels; track lbl.label) {
+      <text [attr.x]="lbl.x" [attr.y]="lbl.y" class="string-label" text-anchor="end">{{ lbl.label }}</text>
+    }
+
+    <!-- Fret number labels -->
+    @for (lbl of fretLabels; track lbl.label) {
+      <text [attr.x]="lbl.x" y="14" class="fret-label" text-anchor="middle">{{ lbl.label }}</text>
+    }
+
+    <!-- Note dots and names -->
+    @if (showNoteLabels) {
+      @for (note of notes; track note.id) {
+        <circle
+          [attr.cx]="note.cx" [attr.cy]="note.cy" [attr.r]="DOT_R"
+          [class.note-open]="note.isOpen"
+          class="note-dot"
+        />
+        <text
+          [attr.x]="note.cx" [attr.y]="note.cy + 3.5"
+          class="note-text"
+          text-anchor="middle"
+        >{{ note.name }}</text>
+      }
+    }
+  </svg>
+</div>

@@ -1,0 +1,35 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0f0f0f;
+  color: #e0e0e0;
+  font-family: system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+}
+
+.site-header {
+  padding: 1.25rem 1.5rem 0.75rem;
+  border-bottom: 1px solid #2a2a2a;
+
+  h1 {
+    margin: 0 0 0.2rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #c8a84b;
+    letter-spacing: 0.06em;
+  }
+
+  p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #555;
+  }
+}
+
+main {
+  padding: 0.75rem 1rem;
+}

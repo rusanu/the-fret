@@ -1,0 +1,21 @@
+{
+  // https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Serve & Debug",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "Serve",
+      "url": "http://localhost:4200/",
+      "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Test (Karma)",
+      "type": "chrome",
+      "request": "launch",
+      "preLaunchTask": "Test",
+      "url": "http://localhost:9876/debug.html"
+    }
+  ]
+}
