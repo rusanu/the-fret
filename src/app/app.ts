@@ -212,13 +212,26 @@ export class App {
       this.activeChordVoicing = null;
       return;
     }
-    const targetFret = this.activeRegion?.startFret ?? 5;
+
+    const region = this.activeRegion;
+    // Use the center of the region as the anchor fret so the distance
+    // calculation favours voicings inside the region rather than those near fret 0.
+    const targetFret = region
+      ? Math.round((region.startFret + region.endFret) / 2)
+      : 5;
+
+    // For CAGED regions lock the shape so the user gets exactly the shape they picked,
+    // not an open-chord that happens to be equidistant via the open-string tiebreaker.
+    const cagedMatch = region?.id.match(/^caged-([a-g])/);
+    const shapeId    = cagedMatch ? cagedMatch[1].toUpperCase() : undefined;
+
     this.activeChordVoicing = findBestShape(
       this.activeHighlightedChord.chordRootPc,
       this.activeHighlightedChord.intervals,
       this.activeHighlightedChord.name,
       targetFret,
       this.selectedTuning,
+      shapeId,
     );
   }
 
