@@ -121,5 +121,45 @@
         >✕</text>
       }
     }
+
+    <!-- Region bands (pentatonic boxes + CAGED shapes) -->
+    @if (pentBandCells.length > 0) {
+      <text [attr.x]="LW - 5" [attr.y]="pentBandY + BAND_H / 2 + 3.5" class="band-group-label" text-anchor="end">Pent</text>
+      @for (cell of pentBandCells; track cell.id) {
+        <rect
+          [attr.x]="cell.x + 1" [attr.y]="cell.y"
+          [attr.width]="cell.w - 2" [attr.height]="cell.h"
+          [class.band-selected]="cell.isSelected"
+          class="band-cell band-pent"
+          style="cursor:pointer"
+          (click)="onBandClick(cell.region)"
+        />
+        <text
+          [attr.x]="cell.x + cell.w / 2" [attr.y]="cell.y + cell.h / 2 + 3.5"
+          class="band-label"
+          text-anchor="middle"
+          style="pointer-events:none"
+        >{{ cell.label }}</text>
+      }
+    }
+    @if (cagedBandCells.length > 0) {
+      <text [attr.x]="LW - 5" [attr.y]="cagedBandY + BAND_H / 2 + 3.5" class="band-group-label" text-anchor="end">CAGED</text>
+      @for (cell of cagedBandCells; track cell.id) {
+        <rect
+          [attr.x]="cell.x + 1" [attr.y]="cell.y"
+          [attr.width]="cell.w - 2" [attr.height]="cell.h"
+          [class.band-selected]="cell.isSelected"
+          class="band-cell band-caged"
+          style="cursor:pointer"
+          (click)="onBandClick(cell.region)"
+        />
+        <text
+          [attr.x]="cell.x + cell.w / 2" [attr.y]="cell.y + cell.h / 2 + 3.5"
+          class="band-label"
+          text-anchor="middle"
+          style="pointer-events:none"
+        >{{ cell.label }}</text>
+      }
+    }
   </svg>
 </div>

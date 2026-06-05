@@ -13,22 +13,6 @@
     <app-pitch-set-selector (setSelected)="onSetSelected($event)" />
   </div>
   <div class="control-group">
-    <span class="control-label">Region</span>
-    <div class="region-row">
-      <app-region-selector
-        [regions]="regions"
-        [selectedRegionId]="activeRegion?.id ?? null"
-        (regionSelected)="onRegionSelected($event)"
-      />
-      @if (activeRegion) {
-        <div class="oct-btns">
-          <button class="opt-btn" [class.active]="regionOctaveShift === 0"  (click)="setRegionOctave(0)">Low</button>
-          <button class="opt-btn" [class.active]="regionOctaveShift === 12" [disabled]="regionHighDisabled" (click)="setRegionOctave(12)">High</button>
-        </div>
-      }
-    </div>
-  </div>
-  <div class="control-group">
     <span class="control-label">Tuning</span>
     <app-tuning-selector (tuningSelected)="onTuningSelected($event)" />
   </div>
@@ -53,12 +37,15 @@
   <app-fretboard
     [tuning]="selectedTuning"
     [highlightSet]="mainVoicing ? null : highlightSet"
-    [activeRegion]="shiftedRegion"
+    [activeRegion]="activeRegion"
     [voicing]="mainVoicing"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
     [chordHighlightPcs]="mainVoicing ? null : chordHighlightPcs"
     [dimUnset]="true"
+    [regionBands]="regions"
+    [selectedRegionId]="activeRegion?.id ?? null"
+    (regionBandClick)="onRegionSelected($event)"
   />
   <div class="main-actions">
     <button class="save-btn" [disabled]="!canSave" (click)="onSaveMain()">Save view</button>

@@ -138,6 +138,42 @@
   pointer-events: none;
 }
 
+// ── Region bands ────────────────────────────────────────────────────────────
+
+.band-group-label {
+  font-size: 8px;
+  font-family: monospace;
+  fill: #4a4a4a;
+  dominant-baseline: middle;
+}
+
+.band-cell {
+  rx: 3;
+  opacity: 0.55;
+  transition: opacity 0.1s;
+
+  &:hover { opacity: 0.85; }
+  &.band-selected { opacity: 1; }
+}
+
+.band-pent        { fill: #1a5c5c; }
+.band-pent.band-selected  { fill: #20a0a0; stroke: #4dd0d0; stroke-width: 1.5; }
+
+.band-caged       { fill: #2a3a1a; }
+.band-caged.band-selected { fill: #508030; stroke: #80c050; stroke-width: 1.5; }
+
+.band-label {
+  font-size: 9px;
+  font-family: monospace;
+  fill: #ccc;
+  dominant-baseline: middle;
+}
+
+.band-cell.band-selected + .band-label,
+.band-selected ~ .band-label { fill: #fff; font-weight: 600; }
+
+// ── Note text ────────────────────────────────────────────────────────────────
+
 .note-text {
   fill: #dde8ff;
   font-size: 8px;

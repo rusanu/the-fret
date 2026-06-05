@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { noteAt, noteNameAt } from '../core/pitch';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
 import { Voicing } from '../core/caged';
@@ -50,6 +50,17 @@ interface FretWire { x: number; isNut: boolean; }
 interface InlayDot { id: string; cx: number; cy: number; }
 interface StringInfo { num: number; y: number; strokeWidth: number; }
 
+interface BandCell {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  isSelected: boolean;
+  region: Region;
+}
+
 @Component({
   selector: 'app-fretboard',
   standalone: true,
@@ -66,8 +77,11 @@ export class FretboardComponent implements OnInit, OnChanges {
   @Input() activeRegion: Region | null = null;
   @Input() voicing: Voicing | null = null;
   @Input() chordHighlightPcs: Set<number> | null = null;
+  @Input() regionBands: Region[] = [];
+  @Input() selectedRegionId: string | null = null;
+  @Output() regionBandClick = new EventEmitter<Region | null>();
 
-  private readonly LW = 32;
+  readonly LW = 32;
   private readonly FW = 40;
   private readonly PT = 26;
   private readonly SS = 26;
@@ -92,6 +106,12 @@ export class FretboardComponent implements OnInit, OnChanges {
   fretLabels: { x: number; label: string }[] = [];
   stringLabels: { x: number; y: number; label: string }[] = [];
   notes: NoteCell[] = [];
+  pentBandCells: BandCell[] = [];
+  cagedBandCells: BandCell[] = [];
+  bandGroupLabelY = 0;
+  pentBandY = 0;
+  cagedBandY = 0;
+  readonly BAND_H = 18;
   voicingDots: VoicingDot[] = [];
   mutedMarkers: MutedMarker[] = [];
   voicingBarre: VoicingBarre | null = null;
@@ -105,9 +125,15 @@ export class FretboardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes ||
-        'activeRegion' in changes || 'voicing' in changes) {
+        'activeRegion' in changes || 'voicing' in changes ||
+        'regionBands' in changes || 'selectedRegionId' in changes) {
       this.rebuild();
     }
+  }
+
+  onBandClick(region: Region): void {
+    // Toggle: clicking the active region deselects it
+    this.regionBandClick.emit(region.id === this.selectedRegionId ? null : region);
   }
 
   shouldShowLabel(note: NoteCell): boolean {
@@ -129,9 +155,29 @@ export class FretboardComponent implements OnInit, OnChanges {
     const neckTop    = this.PT - 4;
     const neckBottom = this.PT + 5 * this.SS + 4;
 
+    const hasBands = this.regionBands.some(r => r.group !== 'blues');
+    const BAND_GAP = 4;
+    const bandsExtra = hasBands ? 8 + this.BAND_H + BAND_GAP + this.BAND_H + 6 : 20;
+
     this.svgWidth  = this.LW + (fc + 1) * this.FW + 8;
-    this.svgHeight = neckBottom + 20;
+    this.svgHeight = neckBottom + bandsExtra;
     this.viewBox = `0 0 ${this.svgWidth} ${this.svgHeight}`;
+
+    // Band positions
+    this.pentBandY = neckBottom + 8;
+    this.cagedBandY = this.pentBandY + this.BAND_H + BAND_GAP;
+
+    // Band cells
+    this.pentBandCells = [];
+    this.cagedBandCells = [];
+    for (const r of this.regionBands) {
+      if (r.group === 'blues') continue;
+      const x = this.LW + r.startFret * this.FW;
+      const w = (r.endFret - r.startFret + 1) * this.FW;
+      const cell: BandCell = { id: r.id, label: r.shortLabel, x, w, y: 0, h: this.BAND_H, isSelected: r.id === this.selectedRegionId, region: r };
+      if (r.group === 'pentatonic') { cell.y = this.pentBandY; this.pentBandCells.push(cell); }
+      else                          { cell.y = this.cagedBandY; this.cagedBandCells.push(cell); }
+    }
 
     this.neckX = this.LW + this.FW;
     this.neckY = neckTop;
