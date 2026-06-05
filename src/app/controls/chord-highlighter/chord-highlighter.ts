@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { DiatonicChord, getDiatonicTriads } from '../../core/harmony';
 import { HighlightSet } from '../../fretboard/fretboard';
 
@@ -23,10 +23,11 @@ export class ChordHighlighterComponent implements OnChanges {
     return (this.highlightSet?.intervals.length ?? 0) >= 7;
   }
 
-  ngOnChanges(): void {
-    // Only update own internal state here — do NOT emit to parent.
-    // Parent (AppComponent) resets its chord-highlight state in onRootSelected /
-    // onSetSelected before change detection starts, avoiding NG0100.
+  ngOnChanges(changes: SimpleChanges): void {
+    // Only reset when the scale itself changes — not when canAddToProgression
+    // flips (which also triggers ngOnChanges and would wipe selectedChord).
+    if (!('highlightSet' in changes)) return;
+
     this.chords = [];
     this.selectedChord = null;
     if (!this.isVisible || !this.highlightSet) return;
