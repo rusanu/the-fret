@@ -8,6 +8,10 @@ const TONE_SEMITONES: Record<string, number> = {
 
 // Find the fret on `stringNum` that sounds `targetPc`, picking the occurrence
 // closest to `guideFret` (the fret the standard-tuning template would suggest).
+// Returns -1 when no valid fret exists within one octave of guideFret.
+// This rejects C-shape / G-shape candidates at rootFret=0 where the guide
+// fret is negative: the tuning-aware search would wrap to fret 9–11 (an octave
+// above the guide), producing an unplayable position far up the neck.
 function tuningAwareFret(
   targetPc: number,
   stringNum: number,
@@ -15,9 +19,10 @@ function tuningAwareFret(
   tuning: readonly string[],
 ): number {
   const base = fretForPitchClass(targetPc, stringNum, tuning); // lowest fret (0–11)
-  // Shift up by octaves until we're close to guideFret
   let fret = base;
   while (fret < guideFret - 5 && fret + 12 <= 24) fret += 12;
+  // Reject if the result is more than 11 frets from the guide (octave-wrap artefact)
+  if (Math.abs(fret - guideFret) > 11) return -1;
   return fret;
 }
 
@@ -193,6 +198,21 @@ export function findBestShape(
       if (frettedFrets.length > 1) {
         const span = Math.max(...frettedFrets) - Math.min(...frettedFrets);
         if (span > 4) continue;
+      }
+
+      // Playability checks — two cases:
+      const hasOpenString = positions.some(p => p.fret === 0);
+      const isBarre = !hasOpenString && tmpl.id !== '5'; // power chords have no barre
+
+      if (isBarre) {
+        // Barre chord: index finger is the barre at rootFret; only 3 remain.
+        // (a) No position can fall BELOW the barre — impossible to fret behind it.
+        // (b) At most 3 individual fingers ABOVE the barre.
+        if (positions.some(p => p.fret > 0 && p.fret < rootFret)) continue; // (a)
+        if (positions.filter(p => p.fret > rootFret).length > 3)   continue; // (b)
+      } else {
+        // Open chord / power chord: no barre, so all 4 fingers are free.
+        if (positions.filter(p => p.fret > 0).length > 4) continue;
       }
 
       const dist  = Math.abs(rootFret - targetFret);
