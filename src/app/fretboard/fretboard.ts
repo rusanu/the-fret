@@ -175,27 +175,32 @@ export class FretboardComponent implements OnInit, OnChanges {
 
     // Voicing dots (replaces scale dots when voicing is active)
     if (this.voicing) {
-      const positions  = this.voicing.positions;
-      const nonZero    = positions.filter(p => p.fret > 0).map(p => p.fret);
-      const barFret    = nonZero.length ? Math.min(...nonZero) : 0;
-      const barrePoss  = positions.filter(p => p.fret === barFret);
-      const hasBar     = barFret > 0 && barrePoss.length >= 2;
+      const positions    = this.voicing.positions;
+      const nonZero      = positions.filter(p => p.fret > 0).map(p => p.fret);
+      const barFret      = nonZero.length ? Math.min(...nonZero) : 0;
+      const hasOpenStr   = positions.some(p => p.fret === 0);
+      // Barre only for CAGED shapes with no open strings (i.e. movable/barre chords).
+      // Open chords: strings share frets by coincidence — no barre finger.
+      // Power chords: index finger plays root only, no cross-string barre.
+      const CAGED        = new Set(['E', 'A', 'D', 'C', 'G']);
+      const isMovable    = !hasOpenStr && CAGED.has(this.voicing.shape);
 
-      if (hasBar) {
-        const strings = barrePoss.map(p => p.string);
-        const topStr  = Math.min(...strings); // lowest string number = highest pitch = top
-        const botStr  = Math.max(...strings);
+      if (isMovable) {
+        // Barre spans from the shape's root string (lowest pitch in barre, largest string number)
+        // down to str1 (highest pitch). This correctly covers D-shape (str4→str1),
+        // A-shape (str5→str1), E-shape (str6→str1) etc.
+        const rootStr = this.voicing.rootString;
         this.voicingBarre = {
           cx: this.nx(barFret),
-          y1: this.ny(topStr) - this.DOT_R,
-          y2: this.ny(botStr) + this.DOT_R,
+          y1: this.ny(1)       - this.DOT_R, // str1 = top in fretboard (smallest y)
+          y2: this.ny(rootStr) + this.DOT_R, // rootStr = bottom of barre
         };
       } else {
         this.voicingBarre = null;
       }
 
       this.voicingDots = positions
-        .filter(p => p.fret > 0 && !(hasBar && p.fret === barFret))
+        .filter(p => p.fret > 0 && !(isMovable && p.fret === barFret))
         .map(p => ({
           id: `v${p.string}`,
           cx: this.nx(p.fret),

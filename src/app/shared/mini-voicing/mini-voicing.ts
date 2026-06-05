@@ -85,29 +85,28 @@ export class MiniVoicingComponent implements OnChanges {
     // For movable chords (startFret > 1): draw a barre bar across ALL non-muted
     // strings at startFret. Conventional chord-diagram notation shows the barre
     // as the "virtual capo" that replaces the nut.
-    if (this.startFret > 1) {
-      const barreStrings = positions
-        .filter(p => p.fret === this.startFret)
-        .map(p => p.string);
+    // Barre only for CAGED shapes with no open strings (movable/barre chords).
+    // Open chords: fret coincidences are not barre fingers.
+    // Power chords: root-only index, no cross-string barre.
+    const CAGED     = new Set(['E', 'A', 'D', 'C', 'G']);
+    const isMovable = !hasOpen && CAGED.has(this.voicing.shape);
 
-      if (barreStrings.length >= 2) {
-        // Span from the highest (numerically largest, = lowest pitch = leftmost)
-        // to the lowest (numerically smallest, = highest pitch = rightmost) string.
-        const x1 = Math.min(...barreStrings.map(s => this.strX(s)));
-        const x2 = Math.max(...barreStrings.map(s => this.strX(s)));
-        this.barre = { x1, x2, cy: this.dotY(this.startFret) };
-      } else {
-        this.barre = null;
-      }
+    if (isMovable) {
+      // Barre spans from rootString (lowest pitch = leftmost in chord diagram)
+      // to str1 (highest pitch = rightmost). Covers D-shape str4→str1, etc.
+      const rootStr = this.voicing.rootString;
+      this.barre = {
+        x1: this.strX(rootStr), // rootString x (leftmost end of barre)
+        x2: this.strX(1),       // str1 x (rightmost end of barre)
+        cy: this.dotY(this.startFret),
+      };
     } else {
       this.barre = null;
     }
 
     // ── Finger dots ────────────────────────────────────────────────────────
-    // Skip positions at startFret when a barre bar is drawn (the bar represents them).
-    const barreActive = this.barre !== null;
     this.dots = positions
-      .filter(p => p.fret > 0 && !(barreActive && p.fret === this.startFret))
+      .filter(p => p.fret > 0 && !(isMovable && p.fret === this.startFret))
       .map(p => ({
         cx: this.strX(p.string),
         cy: this.dotY(p.fret),
