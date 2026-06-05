@@ -14,6 +14,7 @@ export interface FretboardPanel {
   showNoteLabels: boolean;
   showDegrees: boolean;
   tuning: Tuning;
+  chordHighlightPcs: Set<number> | null;
 }
 
 export { STANDARD_TUNING }; // re-export for panel creation convenience

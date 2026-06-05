@@ -101,6 +101,7 @@ export class App {
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
       tuning: this.selectedTuning,
+      chordHighlightPcs: null,
     }, ...this.panels];
   }
 
@@ -119,6 +120,7 @@ export class App {
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
       tuning: this.selectedTuning,
+      chordHighlightPcs: this.chordHighlightPcs,
     }, ...this.panels];
   }
 
