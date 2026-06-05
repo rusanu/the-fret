@@ -39,6 +39,12 @@ interface MutedMarker {
   cy: number;
 }
 
+interface VoicingBarre {
+  cx: number;
+  y1: number;  // top of bar (smaller y = higher string = string 1)
+  y2: number;  // bottom of bar
+}
+
 interface FretWire { x: number; isNut: boolean; }
 interface InlayDot { id: string; cx: number; cy: number; }
 interface StringInfo { num: number; y: number; strokeWidth: number; }
@@ -87,6 +93,7 @@ export class FretboardComponent implements OnInit, OnChanges {
   notes: NoteCell[] = [];
   voicingDots: VoicingDot[] = [];
   mutedMarkers: MutedMarker[] = [];
+  voicingBarre: VoicingBarre | null = null;
 
   private readonly MARKER_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21]);
   private readonly DOUBLE_FRETS  = new Set([12, 24]);
@@ -168,20 +175,42 @@ export class FretboardComponent implements OnInit, OnChanges {
 
     // Voicing dots (replaces scale dots when voicing is active)
     if (this.voicing) {
-      this.voicingDots = this.voicing.positions.map(p => ({
-        id: `v${p.string}`,
-        cx: this.nx(p.fret),
-        cy: this.ny(p.string),
-        tone: p.tone,
-        noteName: noteNameAt(p.string, p.fret, this.tuning),
-        isRoot: p.tone === '1',
-      }));
+      const positions  = this.voicing.positions;
+      const nonZero    = positions.filter(p => p.fret > 0).map(p => p.fret);
+      const barFret    = nonZero.length ? Math.min(...nonZero) : 0;
+      const barrePoss  = positions.filter(p => p.fret === barFret);
+      const hasBar     = barFret > 0 && barrePoss.length >= 2;
+
+      if (hasBar) {
+        const strings = barrePoss.map(p => p.string);
+        const topStr  = Math.min(...strings); // lowest string number = highest pitch = top
+        const botStr  = Math.max(...strings);
+        this.voicingBarre = {
+          cx: this.nx(barFret),
+          y1: this.ny(topStr) - this.DOT_R,
+          y2: this.ny(botStr) + this.DOT_R,
+        };
+      } else {
+        this.voicingBarre = null;
+      }
+
+      this.voicingDots = positions
+        .filter(p => p.fret > 0 && !(hasBar && p.fret === barFret))
+        .map(p => ({
+          id: `v${p.string}`,
+          cx: this.nx(p.fret),
+          cy: this.ny(p.string),
+          tone: p.tone,
+          noteName: noteNameAt(p.string, p.fret, this.tuning),
+          isRoot: p.tone === '1',
+        }));
       this.mutedMarkers = this.voicing.mutedStrings.map(s => ({
         id: `mx${s}`, cx: this.nx(0), cy: this.ny(s),
       }));
     } else {
       this.voicingDots = [];
       this.mutedMarkers = [];
+      this.voicingBarre = null;
     }
 
     // Scale / arpeggio note cells (used when no voicing is active)

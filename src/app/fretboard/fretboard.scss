@@ -104,6 +104,12 @@
   .note-dot.chord-fade { opacity: 0.18; }
 }
 
+// Voicing barre bar (index finger / capo position)
+.voicing-barre {
+  fill: #b0b0b0;
+  opacity: 0.9;
+}
+
 // Voicing dots (chord shape finder)
 .voicing-dot {
   fill: #1a6e52;

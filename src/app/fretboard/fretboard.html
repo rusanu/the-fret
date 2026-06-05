@@ -87,6 +87,16 @@
 
     <!-- Voicing dots (shown instead of scale dots) -->
     @if (voicing) {
+      @if (voicingBarre) {
+        <rect
+          class="voicing-barre"
+          [attr.x]="voicingBarre.cx - DOT_R"
+          [attr.y]="voicingBarre.y1"
+          [attr.width]="DOT_R * 2"
+          [attr.height]="voicingBarre.y2 - voicingBarre.y1"
+          [attr.rx]="DOT_R"
+        />
+      }
       @for (dot of voicingDots; track dot.id) {
         <circle
           [attr.cx]="dot.cx" [attr.cy]="dot.cy" [attr.r]="DOT_R"
