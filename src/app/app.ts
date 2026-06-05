@@ -38,6 +38,7 @@ export class App {
   highlightSet: HighlightSet | null = null;
   regions: Region[] = [];
   activeRegion: Region | null = null;
+  regionOctaveShift: 0 | 12 = 0;
 
   chordHighlightPcs: Set<number> | null = null;
   chordHighlightLabel: string | null = null;
@@ -76,6 +77,19 @@ export class App {
 
   get canSave(): boolean { return this.highlightSet !== null; }
 
+  get shiftedRegion(): Region | null {
+    if (!this.activeRegion) return null;
+    return {
+      ...this.activeRegion,
+      startFret: this.activeRegion.startFret + this.regionOctaveShift,
+      endFret:   this.activeRegion.endFret   + this.regionOctaveShift,
+    };
+  }
+
+  get regionHighDisabled(): boolean {
+    return !this.activeRegion || this.activeRegion.endFret + 12 > 24;
+  }
+
   get canAddChordHighlightToProgression(): boolean {
     return this.activeChordVoicing !== null;
   }
@@ -99,8 +113,13 @@ export class App {
 
   onRegionSelected(region: Region | null): void {
     this.activeRegion = region;
+    this.regionOctaveShift = 0;
     this.progressionActiveVoicing = null;
-    // Recompute the chord voicing for the new region
+    this.recomputeChordVoicing();
+  }
+
+  setRegionOctave(shift: 0 | 12): void {
+    this.regionOctaveShift = shift;
     this.recomputeChordVoicing();
   }
 
@@ -213,7 +232,7 @@ export class App {
       this.activeChordVoicing = null;
       return;
     }
-    const targetFret = this.activeRegion?.startFret ?? 5;
+    const targetFret = this.shiftedRegion?.startFret ?? 5;
     this.activeChordVoicing = findBestShape(
       this.activeHighlightedChord.chordRootPc,
       this.activeHighlightedChord.intervals,
@@ -229,6 +248,7 @@ export class App {
       ? computeRegions(this.selectedRoot, this.selectedTuning)
       : [];
     this.activeRegion = prevId ? (this.regions.find(r => r.id === prevId) ?? null) : null;
+    this.regionOctaveShift = 0;
   }
 
   private syncHighlightSet(): void {

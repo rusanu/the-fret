@@ -14,11 +14,19 @@
   </div>
   <div class="control-group">
     <span class="control-label">Region</span>
-    <app-region-selector
-      [regions]="regions"
-      [selectedRegionId]="activeRegion?.id ?? null"
-      (regionSelected)="onRegionSelected($event)"
-    />
+    <div class="region-row">
+      <app-region-selector
+        [regions]="regions"
+        [selectedRegionId]="activeRegion?.id ?? null"
+        (regionSelected)="onRegionSelected($event)"
+      />
+      @if (activeRegion) {
+        <div class="oct-btns">
+          <button class="opt-btn" [class.active]="regionOctaveShift === 0"  (click)="setRegionOctave(0)">Low</button>
+          <button class="opt-btn" [class.active]="regionOctaveShift === 12" [disabled]="regionHighDisabled" (click)="setRegionOctave(12)">High</button>
+        </div>
+      }
+    </div>
   </div>
   <div class="control-group">
     <span class="control-label">Tuning</span>
@@ -45,7 +53,7 @@
   <app-fretboard
     [tuning]="selectedTuning"
     [highlightSet]="mainVoicing ? null : highlightSet"
-    [activeRegion]="activeRegion"
+    [activeRegion]="shiftedRegion"
     [voicing]="mainVoicing"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"

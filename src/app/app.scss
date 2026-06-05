@@ -25,9 +25,15 @@
   color: #4a4a4a;
 }
 
-.opt-btns {
+.opt-btns, .oct-btns {
   display: flex;
   gap: 4px;
+}
+
+.region-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .chord-bar {
