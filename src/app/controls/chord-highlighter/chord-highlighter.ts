@@ -24,11 +24,11 @@ export class ChordHighlighterComponent implements OnChanges {
   }
 
   ngOnChanges(): void {
+    // Only update own internal state here — do NOT emit to parent.
+    // Parent (AppComponent) resets its chord-highlight state in onRootSelected /
+    // onSetSelected before change detection starts, avoiding NG0100.
     this.chords = [];
     this.selectedChord = null;
-    this.chordPcsChanged.emit(null);
-    this.chordSelected.emit(null);
-
     if (!this.isVisible || !this.highlightSet) return;
     this.chords = getDiatonicTriads(this.highlightSet.root, this.highlightSet.intervals);
   }

@@ -76,12 +76,14 @@ export class App {
 
   onRootSelected(root: number | null): void {
     this.selectedRoot = root;
+    this.resetChordHighlight();
     this.recomputeRegions();
     this.syncHighlightSet();
   }
 
   onSetSelected(def: PitchSetDef | null): void {
     this.selectedSetDef = def;
+    this.resetChordHighlight();
     this.syncHighlightSet();
   }
 
@@ -186,6 +188,12 @@ export class App {
   }
 
   // ── Private helpers ──────────────────────────────────────────────────────
+
+  private resetChordHighlight(): void {
+    this.activeHighlightedChord = null;
+    this.chordHighlightPcs = null;
+    this.chordHighlightLabel = null;
+  }
 
   private recomputeRegions(): void {
     const prevId = this.activeRegion?.id ?? null;
