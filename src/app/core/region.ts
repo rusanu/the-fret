@@ -36,11 +36,11 @@ export function computeRegions(rootPc: number, tuning: readonly string[]): Regio
     { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 2,              endFret: R + 5  },
     { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4,              endFret: R + 8  },
     { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 7,              endFret: R + 10 },
-    { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: Math.max(0, R - 3), endFret: R      },
+    { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R - 3, endFret: R },
   ];
 
   const cagedBase: Region[] = [
-    { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: Math.max(0, R - 1), endFret: R + 3  },
+    { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R - 1, endFret: R + 3  },
     { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 2,              endFret: R + 5  },
     { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 4,              endFret: R + 8  },
     { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 7,              endFret: R + 11 },
