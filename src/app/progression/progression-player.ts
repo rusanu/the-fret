@@ -50,6 +50,7 @@ export class ProgressionPlayerComponent implements OnChanges, OnDestroy {
     if (this.timerId !== null) clearInterval(this.timerId);
     this.timerId = null;
     this.isPlaying = false;
+    this.activeVoicingChanged.emit(null); // release the main fretboard
   }
 
   stepPrev(): void {

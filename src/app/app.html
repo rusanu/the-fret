@@ -44,12 +44,12 @@
 <main>
   <app-fretboard
     [tuning]="selectedTuning"
-    [highlightSet]="progressionActiveVoicing ? null : highlightSet"
+    [highlightSet]="mainVoicing ? null : highlightSet"
     [activeRegion]="activeRegion"
-    [voicing]="progressionActiveVoicing"
+    [voicing]="mainVoicing"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
-    [chordHighlightPcs]="progressionActiveVoicing ? null : chordHighlightPcs"
+    [chordHighlightPcs]="mainVoicing ? null : chordHighlightPcs"
     [dimUnset]="true"
   />
   <div class="main-actions">

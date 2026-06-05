@@ -42,16 +42,25 @@ export class App {
   chordHighlightPcs: Set<number> | null = null;
   chordHighlightLabel: string | null = null;
   activeHighlightedChord: DiatonicChord | null = null;
+  // Voicing computed from the chord highlighter selection (shown on main fretboard)
+  activeChordVoicing: Voicing | null = null;
 
   chordNoResult = false;
   panels: FretboardPanel[] = [];
 
   progressionItems: ProgressionItem[] = [];
+  // Voicing from the progression player (takes priority over activeChordVoicing)
   progressionActiveVoicing: Voicing | null = null;
   private nextProgressionId = 0;
   private nextPanelId = 0;
 
   private static readonly CAGED_SHAPES = new Set(['C', 'A', 'G', 'E', 'D']);
+
+  // The voicing currently shown on the main fretboard.
+  // Progression playback takes priority; chord-highlighter selection is the fallback.
+  get mainVoicing(): Voicing | null {
+    return this.progressionActiveVoicing ?? this.activeChordVoicing;
+  }
 
   private tuningTag(): string {
     if (this.selectedTuning === STANDARD_TUNING) return '';
@@ -67,7 +76,6 @@ export class App {
 
   get canSave(): boolean { return this.highlightSet !== null; }
 
-  // "Add to progression" from chord highlighter requires a specific region (not All Neck)
   get canAddChordHighlightToProgression(): boolean {
     return this.activeHighlightedChord !== null && this.activeRegion !== null;
   }
@@ -77,6 +85,7 @@ export class App {
   onRootSelected(root: number | null): void {
     this.selectedRoot = root;
     this.resetChordHighlight();
+    this.progressionActiveVoicing = null;
     this.recomputeRegions();
     this.syncHighlightSet();
   }
@@ -84,17 +93,22 @@ export class App {
   onSetSelected(def: PitchSetDef | null): void {
     this.selectedSetDef = def;
     this.resetChordHighlight();
+    this.progressionActiveVoicing = null;
     this.syncHighlightSet();
   }
 
   onRegionSelected(region: Region | null): void {
     this.activeRegion = region;
+    this.progressionActiveVoicing = null;
+    // Recompute the chord voicing for the new region
+    this.recomputeChordVoicing();
   }
 
   onTuningSelected(tuning: Tuning): void {
     this.selectedTuning = tuning;
     this.progressionItems = [];
     this.progressionActiveVoicing = null;
+    this.activeChordVoicing = null;
     this.recomputeRegions();
   }
 
@@ -107,6 +121,7 @@ export class App {
 
   onChordSelected(chord: DiatonicChord | null): void {
     this.activeHighlightedChord = chord;
+    this.recomputeChordVoicing();
   }
 
   onAddChordHighlightToProgression(chord: DiatonicChord): void {
@@ -195,6 +210,22 @@ export class App {
     this.activeHighlightedChord = null;
     this.chordHighlightPcs = null;
     this.chordHighlightLabel = null;
+    this.activeChordVoicing = null;
+  }
+
+  private recomputeChordVoicing(): void {
+    if (!this.activeHighlightedChord) {
+      this.activeChordVoicing = null;
+      return;
+    }
+    const targetFret = this.activeRegion?.startFret ?? 5;
+    this.activeChordVoicing = findBestShape(
+      this.activeHighlightedChord.chordRootPc,
+      this.activeHighlightedChord.intervals,
+      this.activeHighlightedChord.name,
+      targetFret,
+      this.selectedTuning,
+    );
   }
 
   private recomputeRegions(): void {
