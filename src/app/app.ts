@@ -92,6 +92,7 @@ export class App {
 
   onSetSelected(def: PitchSetDef | null): void {
     this.selectedSetDef = def;
+    this.recomputeRegions();
     this.resetChordHighlight();
     this.progressionActiveVoicing = null;
     this.syncHighlightSet();
@@ -255,15 +256,17 @@ export class App {
 
   private recomputeRegions(): void {
     const prevId = this.activeRegion?.id ?? null;
-    this.regions = this.selectedRoot !== null
-      ? computeRegions(this.selectedRoot, this.selectedTuning)
+    this.regions = 
+      this.selectedRoot !== null &&
+      this.selectedSetDef != null
+      ? computeRegions(this.selectedRoot, this.selectedSetDef,  this.selectedTuning)
       : [];
     this.activeRegion = prevId ? (this.regions.find(r => r.id === prevId) ?? null) : null;
   }
 
   private syncHighlightSet(): void {
     if (this.selectedRoot !== null && this.selectedSetDef !== null) {
-      this.highlightSet = { root: this.selectedRoot, intervals: this.selectedSetDef.intervals };
+      this.highlightSet = { root: this.selectedRoot, intervals: this.selectedSetDef.intervals, strings: this.selectedSetDef.strings };
     } else {
       this.highlightSet = null;
     }

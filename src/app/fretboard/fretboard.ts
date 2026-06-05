@@ -10,6 +10,7 @@ export type NoteState = 'root' | 'in-set' | 'out-of-set' | 'normal';
 export interface HighlightSet {
   root: number;
   intervals: readonly number[];
+  strings?: readonly number[];
 }
 
 interface NoteCell {
@@ -269,6 +270,7 @@ export class FretboardComponent implements OnInit, OnChanges {
     // Scale / arpeggio note cells (used when no voicing is active)
     const hs = this.highlightSet;
     const setNotes = hs ? pitchesInSet(hs.root, hs.intervals) : null;
+    const strings = hs ? hs.strings : null;
     const region = this.activeRegion;
 
     this.notes = [];
@@ -281,7 +283,11 @@ export class FretboardComponent implements OnInit, OnChanges {
         let degree = '';
 
         if (hs && setNotes) {
-          if (pc === hs.root) {
+          // Honor string subset scales first
+          if (strings && !strings.includes(s))
+          {
+            state = 'out-of-set';
+          } else if (pc === hs.root) {
             state = 'root'; degree = '1';
           } else if (setNotes.has(pc)) {
             state = 'in-set'; degree = degreeLabel(pc, hs.root);

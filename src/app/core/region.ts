@@ -1,4 +1,5 @@
 import { fretForPitchClass } from './pitch';
+import { PitchSetDef } from './pitch-set';
 
 export interface Region {
   id: string;
@@ -18,7 +19,7 @@ function withHigh(r: Region): Region[] {
     ...r,
     id: r.id + 'h',
     name: r.name + ' ↑',
-    startFret: r.startFret == 0 ?  11 : (r.startFret + 12) % 24,
+    startFret: (r.startFret + 12) % 24,
     endFret:  r.endFret == 12 ? 24 :  (r.endFret   + 12) % 24,
   };
   const results: Region[] = [];
@@ -31,33 +32,47 @@ function withHigh(r: Region): Region[] {
 
 // Compute all named regions for a given root.
 // Both low and high-octave (+12 frets) variants are included where they fit (0–24).
-// Blues boxes are kept in the data but hidden from the UI (per TODO).
-export function computeRegions(rootPc: number, tuning: readonly string[]): Region[] {
+export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: readonly string[]): Region[] {
   const R = fretForPitchClass(rootPc, 6, tuning); // root fret on string 6
 
-  const pentatonicBase: Region[] = [
-    { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R - 1,              endFret: R + 3  },
-    { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 1,              endFret: R + 5  },
-    { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4,              endFret: R + 8  },
-    { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 6,              endFret: R + 10 },
-    { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9,              endFret: R + 12 },
-  ];
+  console.log(setDef.name, rootPc, setDef, R, tuning);
 
-  const cagedBase: Region[] = [
-    { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R,                  endFret: R + 3  },
-    { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 2,              endFret: R + 5  },
-    { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 4,              endFret: R + 8  },
-    { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 7,              endFret: R + 10 },
-    { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R + 9,              endFret: R + 12 },
-  ];
+  if (setDef.name == 'Minor pentatonic') {
+    const base: Region[] = [
+      { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R,     endFret: R + 3  },
+      { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 2, endFret: R + 5  },
+      { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4, endFret: R + 8  },
+      { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 7, endFret: R + 10 },
+      { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
+    ];
+    return base.flatMap(withHigh);
+  }
+  if (setDef.name == 'BB King') {
+    const base: Region[] = [
+      { id: 'bbk', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R+5,     endFret: R + 9  },
+    ];
+    return base.flatMap(withHigh);
+  }
+  else if (setDef.name == 'Major pentatonic') {
+    const base: Region[] = [
+      { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R - 1, endFret: R + 2  },
+      { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 1, endFret: R + 5  },
+      { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4, endFret: R + 7  },
+      { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 6, endFret: R + 9 },
+      { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
+    ];
+    return base.flatMap(withHigh);    
+  }
+  else if (setDef.category == 'scale' && setDef.intervals.length == 7) {
+    const base: Region[] = [
+      { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R,                  endFret: R + 3  },
+      { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 2,              endFret: R + 5  },
+      { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 4,              endFret: R + 8  },
+      { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 7,              endFret: R + 10 },
+      { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R + 9,              endFret: R + 12 },
+    ];
+    return base.flatMap(withHigh); 
+  }
 
-  const blues: Region[] = [
-    { id: 'bb-box', shortLabel: 'BB', name: 'BB King box',     group: 'blues', startFret: R + 3, endFret: R + 8 },
-    { id: 'ak-box', shortLabel: 'AK', name: 'Albert King box', group: 'blues', startFret: R + 2, endFret: R + 6 },
-  ];
-
-  const pentatonic = pentatonicBase.flatMap(withHigh);
-  const caged      = cagedBase.flatMap(withHigh);
-
-  return [...pentatonic, ...caged, ...blues];
+  return [];
 }
