@@ -77,7 +77,7 @@ export class App {
   get canSave(): boolean { return this.highlightSet !== null; }
 
   get canAddChordHighlightToProgression(): boolean {
-    return this.activeHighlightedChord !== null && this.activeRegion !== null;
+    return this.activeChordVoicing !== null;
   }
 
   // ── Root / scale / region / tuning ──────────────────────────────────────
@@ -124,15 +124,10 @@ export class App {
     this.recomputeChordVoicing();
   }
 
-  onAddChordHighlightToProgression(chord: DiatonicChord): void {
-    if (!this.activeRegion) return;
-    const voicing = findBestShape(
-      chord.chordRootPc, chord.intervals, chord.name,
-      this.activeRegion.startFret, this.selectedTuning,
-    );
-    if (!voicing) return;
+  onAddChordHighlightToProgression(_chord: DiatonicChord): void {
+    if (!this.activeChordVoicing) return;
     this.progressionItems = [...this.progressionItems,
-      { id: `p${++this.nextProgressionId}`, voicing }];
+      { id: `p${++this.nextProgressionId}`, voicing: this.activeChordVoicing }];
   }
 
   // ── Chord finder ────────────────────────────────────────────────────────
