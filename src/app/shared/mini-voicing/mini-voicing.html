@@ -38,7 +38,16 @@
     >{{ m.symbol }}</text>
   }
 
-  <!-- Fingering dots -->
+  <!-- Barre bar (movable chords only — replaces individual dots at startFret) -->
+  @if (barre) {
+    <rect
+      class="barre-bar"
+      [attr.x]="barre.x1 - 5" [attr.y]="barre.cy - 5"
+      [attr.width]="barre.x2 - barre.x1 + 10" height="10" rx="5"
+    />
+  }
+
+  <!-- Finger dots (positions above the barre, or all dots when no barre) -->
   @for (dot of dots; track dot.cx + '-' + dot.cy) {
     <circle
       [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="4.5"

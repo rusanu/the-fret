@@ -3,6 +3,7 @@ import { Voicing } from '../../core/caged';
 
 interface Dot    { cx: number; cy: number; isRoot: boolean; }
 interface Marker { x: number; y: number; symbol: string; isX: boolean; }
+interface Barre  { x1: number; x2: number; cy: number; }
 
 @Component({
   selector: 'app-mini-voicing',
@@ -14,15 +15,15 @@ export class MiniVoicingComponent implements OnChanges {
   @Input() voicing!: Voicing;
 
   // ── Layout constants ──────────────────────────────────────────────────────
-  private readonly SS    = 11;  // string spacing (5 gaps → 55px body width)
-  private readonly FH    = 14;  // fret height
-  private readonly FRETS = 4;   // rows shown
+  private readonly SS    = 11;  // string spacing
+  private readonly FH    = 14;  // fret row height
+  private readonly FRETS = 4;
   private readonly PH    = 8;   // horizontal padding
-  private readonly PT    = 14;  // pad top (X/O row)
-  private readonly PB    = 14;  // pad bottom (fret-number row)
-  private readonly NUT   = 4;   // nut/top-line height
+  private readonly PT    = 14;  // pad top (marker row)
+  private readonly PB    = 14;  // pad bottom (fret-label row)
+  private readonly NUT   = 4;   // nut bar height
 
-  // ── Computed geometry (rebuilt on input change) ───────────────────────────
+  // ── Computed geometry ─────────────────────────────────────────────────────
   svgWidth  = 0;
   svgHeight = 0;
   nutY      = 0;
@@ -34,6 +35,7 @@ export class MiniVoicingComponent implements OnChanges {
   fretLines: number[] = [];
   dots:      Dot[]    = [];
   markers:   Marker[] = [];
+  barre:     Barre | null = null;
   startFret  = 1;
   showLabel  = false;
   labelY     = 0;
@@ -50,12 +52,18 @@ export class MiniVoicingComponent implements OnChanges {
   private rebuild(): void {
     if (!this.voicing) return;
 
-    // Start fret = lowest non-open fret present
-    const fretted = this.voicing.positions.filter(p => p.fret > 0).map(p => p.fret);
-    this.startFret = fretted.length ? Math.min(...fretted) : 1;
+    const positions  = this.voicing.positions;
+    const muted      = new Set(this.voicing.mutedStrings);
+    const hasOpen    = positions.some(p => p.fret === 0);
+    const nonZero    = positions.filter(p => p.fret > 0).map(p => p.fret);
+    const minFret    = nonZero.length ? Math.min(...nonZero) : 1;
+
+    // Open chords (any fret-0) must show the nut — force startFret = 1.
+    // Movable chords start at their lowest fretted position (the barre fret).
+    this.startFret = hasOpen ? 1 : minFret;
 
     const showLabel = this.startFret > 1;
-    this.showLabel = showLabel;
+    this.showLabel  = showLabel;
 
     this.svgWidth  = this.PH * 2 + 5 * this.SS;
     this.svgHeight = this.PT + this.NUT + this.FRETS * this.FH + (showLabel ? this.PB : this.PH);
@@ -70,18 +78,41 @@ export class MiniVoicingComponent implements OnChanges {
 
     this.fretLines = Array.from({ length: this.FRETS + 1 }, (_, i) => this.bodyTop + i * this.FH);
 
-    // Dots (fretted positions within the 4-fret window)
-    this.dots = this.voicing.positions
-      .filter(p => p.fret > 0)
+    // ── Barre bar ──────────────────────────────────────────────────────────
+    // For movable chords (startFret > 1): draw a barre bar across ALL non-muted
+    // strings at startFret. Conventional chord-diagram notation shows the barre
+    // as the "virtual capo" that replaces the nut.
+    if (this.startFret > 1) {
+      const barreStrings = positions
+        .filter(p => p.fret === this.startFret)
+        .map(p => p.string);
+
+      if (barreStrings.length >= 2) {
+        // Span from the highest (numerically largest, = lowest pitch = leftmost)
+        // to the lowest (numerically smallest, = highest pitch = rightmost) string.
+        const x1 = Math.min(...barreStrings.map(s => this.strX(s)));
+        const x2 = Math.max(...barreStrings.map(s => this.strX(s)));
+        this.barre = { x1, x2, cy: this.dotY(this.startFret) };
+      } else {
+        this.barre = null;
+      }
+    } else {
+      this.barre = null;
+    }
+
+    // ── Finger dots ────────────────────────────────────────────────────────
+    // Skip positions at startFret when a barre bar is drawn (the bar represents them).
+    const barreActive = this.barre !== null;
+    this.dots = positions
+      .filter(p => p.fret > 0 && !(barreActive && p.fret === this.startFret))
       .map(p => ({
         cx: this.strX(p.string),
         cy: this.dotY(p.fret),
         isRoot: p.tone === '1',
       }));
 
-    // X / O markers above nut
-    const muted  = new Set(this.voicing.mutedStrings);
-    const openSt = new Set(this.voicing.positions.filter(p => p.fret === 0).map(p => p.string));
+    // ── X / O markers ─────────────────────────────────────────────────────
+    const openSt = new Set(positions.filter(p => p.fret === 0).map(p => p.string));
     this.markers = [];
     for (let s = 1; s <= 6; s++) {
       if (muted.has(s)) {
