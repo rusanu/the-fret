@@ -17,6 +17,9 @@ export const PITCH_SET_LIBRARY: readonly PitchSetDef[] = [
   { name: 'Major blues',      intervals: [0,2,3,4,7,9],     category: 'scale' },
   { name: 'BB King',          intervals: [0,2,3,5,7,9],    category: 'scale', strings:[1,2,3] },
   { name: 'Alfred King',      intervals: [0,3,5,7,10],    category: 'scale', strings:[1,2,3] },
+  { name: 'Byzantine',        intervals: [0,1,4,5,7,8,11],     category: 'scale' },
+  { name: 'Lydian dominant',  intervals: [0,2,4,6,7,9,10],     category: 'scale' },
+  { name: 'Super Locrian',    intervals: [0,1,3,4,6,8,10],     category: 'scale' },
   // Modes of the major scale (in modal order; Ionian and Aeolian cross-referenced from Scales)
   { name: 'Ionian (Major)',            intervals: [0,2,4,5,7,9,11], category: 'mode' },
   { name: 'Dorian',                   intervals: [0,2,3,5,7,9,10], category: 'mode' },
