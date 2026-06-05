@@ -20,8 +20,8 @@ function withHigh(r: Region): Region[] {
     endFret:   (r.endFret   + 12) % 24,
   };
   const results: Region[] = [];
-  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret < r.endFret) results.push(r); // else console.log('rejected r:', r);
-  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret < hi.endFret ) results.push(hi); // else console.log('rejected hi:', hi, r);
+  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret < r.endFret) results.push(r); else console.log('rejected r:', r);
+  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret < hi.endFret ) results.push(hi); else console.log('rejected hi:', hi, r);
   return results;
 }
 
@@ -40,7 +40,7 @@ export function computeRegions(rootPc: number, tuning: readonly string[]): Regio
   ];
 
   const cagedBase: Region[] = [
-    { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R - 1, endFret: R + 3  },
+    { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R,                  endFret: R + 3  },
     { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 2,              endFret: R + 5  },
     { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 4,              endFret: R + 8  },
     { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 7,              endFret: R + 11 },
