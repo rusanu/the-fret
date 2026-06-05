@@ -10,7 +10,7 @@ import { HighlightSet } from '../../fretboard/fretboard';
 })
 export class ChordHighlighterComponent implements OnChanges {
   @Input() highlightSet: HighlightSet | null = null;
-  @Output() chordPcsChanged = new EventEmitter<Set<number> | null>();
+  @Output() chordPcsChanged = new EventEmitter<{ pcs: Set<number>; label: string } | null>();
 
   chords: DiatonicChord[] = [];
   selectedChord: DiatonicChord | null = null;
@@ -35,7 +35,7 @@ export class ChordHighlighterComponent implements OnChanges {
       this.chordPcsChanged.emit(null);
     } else {
       this.selectedChord = chord;
-      this.chordPcsChanged.emit(chord.pitchClasses);
+      this.chordPcsChanged.emit({ pcs: chord.pitchClasses, label: `${chord.numeral} ${chord.name}` });
     }
   }
 }

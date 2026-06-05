@@ -37,6 +37,7 @@ export class App {
   activeRegion: Region | null = null;
 
   chordHighlightPcs: Set<number> | null = null;
+  chordHighlightLabel: string | null = null;
   chordNoResult = false;
   panels: FretboardPanel[] = [];
   private nextId = 0;
@@ -75,8 +76,9 @@ export class App {
     this.activeRegion = region;
   }
 
-  onChordHighlighted(pcs: Set<number> | null): void {
-    this.chordHighlightPcs = pcs;
+  onChordHighlighted(data: { pcs: Set<number>; label: string } | null): void {
+    this.chordHighlightPcs = data?.pcs ?? null;
+    this.chordHighlightLabel = data?.label ?? null;
   }
 
   onTuningSelected(tuning: Tuning): void {
@@ -112,7 +114,7 @@ export class App {
     const regionName = this.activeRegion?.name ?? 'All neck';
     this.panels = [{
       id: `panel-${++this.nextId}`,
-      title: `${rootName} ${scaleName} · ${regionName}${this.tuningTag()}`,
+      title: `${rootName} ${scaleName} · ${regionName}${this.chordHighlightLabel ? ` — ${this.chordHighlightLabel}` : ''}${this.tuningTag()}`,
       type: 'snapshot',
       voicing: null,
       highlightSet: { ...this.highlightSet },
