@@ -93,6 +93,8 @@ export class App {
 
   onTuningSelected(tuning: Tuning): void {
     this.selectedTuning = tuning;
+    this.progressionItems = [];
+    this.progressionActiveVoicing = null;
     this.recomputeRegions();
   }
 
