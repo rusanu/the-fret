@@ -10,12 +10,6 @@ Items discovered during development, not yet scheduled into an iteration.
   show the resulting chord name (if any). Like AmpleGuitar strummer does.
 - **Chord fingering suggestions** — complicated because of barre possibilities, max fingers
   per fret depends on physical fret width, difficult to model reach constraints.
-- **CAGED shape mode** — "find Gm in A-shape" — let the user pick the target CAGED shape
-  explicitly rather than letting the algorithm choose the closest.
-- **Chord highlighter** — while the main fretboard shows a scale/region, display a dropdown
-  of all triads (and 7ths) diatonic to the selected root/scale, highlight the chosen chord's
-  notes on the neck. Show chord names both as absolute (Am, C) and as Roman numerals
-  (i, III) in the context of the selected root and scale.
 
 ---
 
@@ -54,4 +48,5 @@ Items discovered during development, not yet scheduled into an iteration.
   - BPM control: tap-tempo or numeric input; default 80 BPM, 1 chord per bar.
   - Region awareness: show each chord in the selected box/region (e.g. "all in Box 1") or
     in the closest CAGED shape to the previous chord (voice-leading mode).
+  - To be a useful feature (ie. play along) user needs a preview of the next chord to prepare for the change. So the play needs to render the current chord but also the next chord coming up. A "mini fretboard" view that shows only the relevant portion of the neck (4-5 frets, and also probably about 25% size ie. 1/2 height 1/2 width).1 or 2 small mini frets show the upcoming 1-2 chords and main fretboard show the current chord. On beat they change.
   - Audio can be layered on top later once the audio engine exists, but is not a blocker.

@@ -65,3 +65,17 @@
 }
 
 .chord-chip.active .chip-name { color: #8addb8; font-weight: 600; }
+
+.add-progression-btn {
+  padding: 4px 10px;
+  border: 1px solid #2a3a1a;
+  border-radius: 4px;
+  background: #162210;
+  color: #6ac050;
+  font-size: 11px;
+  cursor: pointer;
+  margin-left: 6px;
+  transition: background 0.12s;
+
+  &:hover { background: #1e3018; }
+}

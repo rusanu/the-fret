@@ -1,0 +1,144 @@
+:host { display: block; }
+
+.progression-player {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0.6rem 1.5rem;
+  background: #0c0c12;
+  border-bottom: 1px solid #1e1e2e;
+}
+
+.control-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #4a4a6a;
+}
+
+// ── Sequence strip ──────────────────────────────────────────────────────────
+
+.sequence-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.seq-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px 4px 10px;
+  border: 1px solid #2a2a3a;
+  border-radius: 5px;
+  background: #141420;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+  user-select: none;
+
+  &:hover { background: #1e1e30; border-color: #3a3a5a; }
+
+  &.active {
+    background: #1c2a4a;
+    border-color: #3a6db5;
+  }
+}
+
+.chip-label {
+  font-size: 12px;
+  font-family: monospace;
+  color: #bbb;
+  .active & { color: #88bfff; font-weight: 600; }
+}
+
+.chip-remove {
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 10px;
+  cursor: pointer;
+  padding: 0 2px;
+  line-height: 1;
+
+  &:hover { color: #cc4444; }
+}
+
+// ── Transport ───────────────────────────────────────────────────────────────
+
+.transport {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.transport-btn {
+  padding: 4px 10px;
+  border: 1px solid #2a2a3a;
+  border-radius: 4px;
+  background: #141420;
+  color: #888;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover { background: #1e1e30; color: #bbb; }
+}
+
+.bpm-label {
+  font-size: 11px;
+  color: #4a4a6a;
+  margin-left: 4px;
+}
+
+.bpm-input {
+  width: 52px;
+  background: #141420;
+  color: #bbb;
+  border: 1px solid #2a2a3a;
+  border-radius: 4px;
+  padding: 4px 6px;
+  font-size: 12px;
+  text-align: center;
+
+  &:focus { outline: 1px solid #3a6db5; border-color: #3a6db5; }
+  &::-webkit-outer-spin-button,
+  &::-webkit-inner-spin-button { -webkit-appearance: none; }
+}
+
+.play-btn {
+  padding: 4px 12px;
+  border: 1px solid #2a5a28;
+  border-radius: 4px;
+  background: #162216;
+  color: #6ac060;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover:not(:disabled) { background: #1e321e; }
+  &:disabled { opacity: 0.35; cursor: default; }
+}
+
+.stop-btn {
+  padding: 4px 12px;
+  border: 1px solid #5a2a2a;
+  border-radius: 4px;
+  background: #221616;
+  color: #c06060;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover { background: #321e1e; }
+}
+
+.clear-btn {
+  padding: 4px 10px;
+  border: 1px solid #2a2a3a;
+  border-radius: 4px;
+  background: transparent;
+  color: #555;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover { color: #cc4444; border-color: #cc4444; }
+}

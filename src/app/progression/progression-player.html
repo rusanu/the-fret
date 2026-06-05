@@ -1,0 +1,27 @@
+@if (items.length > 0) {
+  <div class="progression-player">
+    <span class="control-label">Progression</span>
+
+    <div class="sequence-strip">
+      @for (item of items; track item.id; let i = $index) {
+        <div class="seq-chip" [class.active]="i === activeIndex" (click)="jumpTo(i)">
+          <span class="chip-label">{{ chipLabel(item) }}</span>
+          <button class="chip-remove" (click)="$event.stopPropagation(); onRemove(item.id)">✕</button>
+        </div>
+      }
+    </div>
+
+    <div class="transport">
+      <button class="transport-btn" title="Previous" (click)="stepPrev()">◀</button>
+      <button class="transport-btn" title="Next"     (click)="stepNext()">▶</button>
+      <span class="bpm-label">BPM</span>
+      <input class="bpm-input" type="number" min="20" max="300" [value]="bpm" (input)="onBpmInput($event)" />
+      @if (!isPlaying) {
+        <button class="play-btn"  [disabled]="items.length === 0" (click)="play()">▶ Play</button>
+      } @else {
+        <button class="stop-btn" (click)="stop()">■ Stop</button>
+      }
+      <button class="clear-btn" (click)="onClear()">✕ Clear</button>
+    </div>
+  </div>
+}

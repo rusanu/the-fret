@@ -13,5 +13,8 @@
         </button>
       }
     </div>
+    @if (canAddToProgression && selectedChord) {
+      <button class="add-progression-btn" (click)="onAddToProgression()">+ Progression</button>
+    }
   </div>
 }

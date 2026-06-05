@@ -4,6 +4,9 @@
       {{ panel.type === 'voicing' ? 'chord' : 'snapshot' }}
     </span>
     <span class="panel-title">{{ panel.title }}</span>
+    @if (panel.type === 'voicing' && panel.voicing) {
+      <button class="panel-add-btn" (click)="addToProgression.emit(panel.voicing!)">+ Progression</button>
+    }
     <button class="panel-close" (click)="close.emit(panel.id)" aria-label="Close">✕</button>
   </div>
   <app-fretboard

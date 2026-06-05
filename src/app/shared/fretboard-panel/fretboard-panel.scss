@@ -36,6 +36,19 @@
   flex: 1;
 }
 
+.panel-add-btn {
+  padding: 2px 8px;
+  border: 1px solid #2a3a1a;
+  border-radius: 4px;
+  background: #162210;
+  color: #6ac050;
+  font-size: 11px;
+  cursor: pointer;
+  flex-shrink: 0;
+
+  &:hover { background: #1e3018; }
+}
+
 .panel-close {
   padding: 2px 7px;
   border: 1px solid #2e2e2e;

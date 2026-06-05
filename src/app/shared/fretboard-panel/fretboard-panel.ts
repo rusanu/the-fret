@@ -28,5 +28,6 @@ export { STANDARD_TUNING }; // re-export for panel creation convenience
 })
 export class FretboardPanelComponent {
   @Input() panel!: FretboardPanel;
-  @Output() close = new EventEmitter<string>();
+  @Output() close            = new EventEmitter<string>();
+  @Output() addToProgression = new EventEmitter<Voicing>();
 }

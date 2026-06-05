@@ -35,17 +35,21 @@
 
 <app-chord-highlighter
   [highlightSet]="highlightSet"
+  [canAddToProgression]="canAddChordHighlightToProgression"
   (chordPcsChanged)="onChordHighlighted($event)"
+  (chordSelected)="onChordSelected($event)"
+  (addToProgression)="onAddChordHighlightToProgression($event)"
 />
 
 <main>
   <app-fretboard
     [tuning]="selectedTuning"
-    [highlightSet]="highlightSet"
+    [highlightSet]="progressionActiveVoicing ? null : highlightSet"
     [activeRegion]="activeRegion"
+    [voicing]="progressionActiveVoicing"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
-    [chordHighlightPcs]="chordHighlightPcs"
+    [chordHighlightPcs]="progressionActiveVoicing ? null : chordHighlightPcs"
     [dimUnset]="true"
   />
   <div class="main-actions">
@@ -58,10 +62,21 @@
   <app-chord-finder [noResult]="chordNoResult" (findChord)="onChordFind($event)" />
 </div>
 
+<app-progression-player
+  [items]="progressionItems"
+  (activeVoicingChanged)="onProgressionActiveVoicingChanged($event)"
+  (removeItem)="onRemoveProgressionItem($event)"
+  (clearAll)="onClearProgression()"
+/>
+
 @if (panels.length > 0) {
   <section class="panels-section">
     @for (panel of panels; track panel.id) {
-      <app-fretboard-panel [panel]="panel" (close)="onRemovePanel($event)" />
+      <app-fretboard-panel
+        [panel]="panel"
+        (close)="onRemovePanel($event)"
+        (addToProgression)="onAddVoicingToProgression($event)"
+      />
     }
   </section>
 }
