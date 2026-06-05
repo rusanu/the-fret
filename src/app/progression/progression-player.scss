@@ -27,15 +27,16 @@
 
 .seq-chip {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px 4px 10px;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 6px 8px;
   border: 1px solid #2a2a3a;
   border-radius: 5px;
   background: #141420;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s;
   user-select: none;
+  min-width: 80px;
 
   &:hover { background: #1e1e30; border-color: #3a3a5a; }
 
@@ -45,10 +46,19 @@
   }
 }
 
+.chip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
 .chip-label {
-  font-size: 12px;
+  font-size: 11px;
   font-family: monospace;
   color: #bbb;
+  white-space: nowrap;
   .active & { color: #88bfff; font-weight: 600; }
 }
 
@@ -60,6 +70,7 @@
   cursor: pointer;
   padding: 0 2px;
   line-height: 1;
+  flex-shrink: 0;
 
   &:hover { color: #cc4444; }
 }

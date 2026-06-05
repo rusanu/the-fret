@@ -1,0 +1,52 @@
+:host { display: block; }
+
+.mini-voicing {
+  display: block;
+  overflow: visible; // allow fret-label to bleed right
+}
+
+.string-line {
+  stroke: #666;
+  stroke-width: 1;
+}
+
+.fret-line {
+  stroke: #4a4a4a;
+  stroke-width: 0.75;
+}
+
+.nut-bar {
+  fill: #c8b880;
+}
+
+.fret-bar {
+  fill: #4a4a4a;
+}
+
+.marker {
+  font-size: 9px;
+  font-family: monospace;
+  dominant-baseline: auto;
+
+  &.marker-x { fill: #c04040; }
+  &.marker-o { fill: #777; }
+}
+
+.dot-root {
+  fill: #b86820;
+  stroke: #e89838;
+  stroke-width: 1;
+}
+
+.dot-tone {
+  fill: #1a6e48;
+  stroke: #2ab870;
+  stroke-width: 1;
+}
+
+.fret-label {
+  font-size: 9px;
+  font-family: monospace;
+  fill: #777;
+  dominant-baseline: middle;
+}

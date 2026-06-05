@@ -5,8 +5,11 @@
     <div class="sequence-strip">
       @for (item of items; track item.id; let i = $index) {
         <div class="seq-chip" [class.active]="i === activeIndex" (click)="jumpTo(i)">
-          <span class="chip-label">{{ chipLabel(item) }}</span>
-          <button class="chip-remove" (click)="$event.stopPropagation(); onRemove(item.id)">✕</button>
+          <div class="chip-header">
+            <span class="chip-label">{{ chipLabel(item) }}</span>
+            <button class="chip-remove" (click)="$event.stopPropagation(); onRemove(item.id)">✕</button>
+          </div>
+          <app-mini-voicing [voicing]="item.voicing" />
         </div>
       }
     </div>

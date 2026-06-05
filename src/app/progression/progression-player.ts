@@ -1,10 +1,12 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { ProgressionItem } from '../core/progression-item';
 import { Voicing } from '../core/caged';
+import { MiniVoicingComponent } from '../shared/mini-voicing/mini-voicing';
 
 @Component({
   selector: 'app-progression-player',
   standalone: true,
+  imports: [MiniVoicingComponent],
   templateUrl: './progression-player.html',
   styleUrl: './progression-player.scss'
 })

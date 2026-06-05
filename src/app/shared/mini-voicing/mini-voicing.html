@@ -1,0 +1,54 @@
+<svg
+  class="mini-voicing"
+  [attr.viewBox]="'0 0 ' + svgWidth + ' ' + svgHeight"
+  [attr.width]="svgWidth"
+  [attr.height]="svgHeight"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <!-- String lines -->
+  @for (s of strings; track s) {
+    <line
+      [attr.x1]="strX(s)" [attr.y1]="bodyTop"
+      [attr.x2]="strX(s)" [attr.y2]="bodyBot"
+      class="string-line"
+    />
+  }
+
+  <!-- Fret lines -->
+  @for (y of fretLines; track y) {
+    <line [attr.x1]="leftX" [attr.y1]="y" [attr.x2]="rightX" [attr.y2]="y" class="fret-line" />
+  }
+
+  <!-- Nut (thick when startFret=1) or top fret wire (thin) -->
+  <rect
+    [attr.x]="leftX" [attr.y]="nutY"
+    [attr.width]="rightX - leftX" [attr.height]="nutH"
+    [class.nut-bar]="startFret === 1"
+    [class.fret-bar]="startFret !== 1"
+  />
+
+  <!-- X / O markers above nut -->
+  @for (m of markers; track m.x) {
+    <text
+      [attr.x]="m.x" [attr.y]="m.y"
+      text-anchor="middle"
+      [class.marker-x]="m.isX"
+      [class.marker-o]="!m.isX"
+      class="marker"
+    >{{ m.symbol }}</text>
+  }
+
+  <!-- Fingering dots -->
+  @for (dot of dots; track dot.cx + '-' + dot.cy) {
+    <circle
+      [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="4.5"
+      [class.dot-root]="dot.isRoot"
+      [class.dot-tone]="!dot.isRoot"
+    />
+  }
+
+  <!-- Fret number label (e.g. "5fr") -->
+  @if (showLabel) {
+    <text [attr.x]="rightX + 4" [attr.y]="labelY" class="fret-label">{{ startFret }}fr</text>
+  }
+</svg>
