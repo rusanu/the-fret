@@ -35,11 +35,14 @@ export class MiniVoicingComponent implements OnChanges {
   fretLines: number[] = [];
   dots:      Dot[]    = [];
   markers:   Marker[] = [];
-  barre:     Barre | null = null;
-  startFret  = 1;
-  showLabel  = false;
-  labelY     = 0;
-  strings    = [1, 2, 3, 4, 5, 6];
+  barre:      Barre | null = null;
+  startFret   = 1;
+  showLabel   = false;
+  labelY      = 0;
+  strings     = [1, 2, 3, 4, 5, 6];
+  fretLabels: { fret: number; y: number }[] = [];
+
+  private static readonly MARKER_FRETS = new Set([3, 5, 7, 9, 12, 15, 17, 19, 21, 24]);
 
   ngOnChanges(): void { this.rebuild(); }
 
@@ -65,7 +68,7 @@ export class MiniVoicingComponent implements OnChanges {
     const showLabel = this.startFret > 1;
     this.showLabel  = showLabel;
 
-    this.svgWidth  = this.PH * 2 + 5 * this.SS;
+    this.svgWidth  = this.PH * 2 + 5 * this.SS + 16; // +16 for fret number labels on right
     this.svgHeight = this.PT + this.NUT + this.FRETS * this.FH + (showLabel ? this.PB : this.PH);
 
     this.nutY    = this.PT;
@@ -110,6 +113,14 @@ export class MiniVoicingComponent implements OnChanges {
         cy: this.dotY(p.fret),
         isRoot: p.tone === '1',
       }));
+
+    // ── Fret number labels (right side, for notable frets in range) ───────
+    this.fretLabels = [];
+    for (let f = this.startFret; f < this.startFret + this.FRETS; f++) {
+      if (MiniVoicingComponent.MARKER_FRETS.has(f)) {
+        this.fretLabels.push({ fret: f, y: this.dotY(f) });
+      }
+    }
 
     // ── X / O markers ─────────────────────────────────────────────────────
     const openSt = new Set(positions.filter(p => p.fret === 0).map(p => p.string));

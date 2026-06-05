@@ -56,8 +56,13 @@
     />
   }
 
-  <!-- Fret number label (e.g. "5fr") -->
+  <!-- Fret number label (e.g. "5fr") for movable chords -->
   @if (showLabel) {
     <text [attr.x]="rightX + 4" [attr.y]="labelY" class="fret-label">{{ startFret }}fr</text>
+  }
+
+  <!-- Fret position markers on right side (3, 5, 7, 9, 12…) -->
+  @for (lbl of fretLabels; track lbl.fret) {
+    <text [attr.x]="rightX + 4" [attr.y]="lbl.y + 3.5" class="fret-pos-label">{{ lbl.fret }}</text>
   }
 </svg>
