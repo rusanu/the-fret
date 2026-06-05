@@ -205,11 +205,21 @@ export function findBestShape(
       const isBarre = !hasOpenString && tmpl.id !== '5'; // power chords have no barre
 
       if (isBarre) {
-        // Barre chord: index finger is the barre at rootFret; only 3 remain.
-        // (a) No position can fall BELOW the barre — impossible to fret behind it.
-        // (b) At most 3 individual fingers ABOVE the barre.
-        if (positions.some(p => p.fret > 0 && p.fret < rootFret)) continue; // (a)
-        if (positions.filter(p => p.fret > rootFret).length > 3)   continue; // (b)
+        // The barre sits at the *lowest fretted note* (barFret), which equals rootFret
+        // for E/A/D shapes (all non-negative offsets) but is LOWER than rootFret for
+        // G-shape and C-shape (negative offsets by design — fingers go down from root).
+        //
+        // Using barFret as the anchor:
+        //   (a) No position below barFret — impossible to fret behind the barre.
+        //   (b) At most 3 individual fingers ABOVE barFret (4th finger is the barre).
+        //
+        // For E/A/D: barFret === rootFret, so alternate-tuning artifacts that land below
+        // rootFret are still rejected (same as before).
+        // For G/C: barFret < rootFret, so the intentional low-fret fingers are accepted.
+        const minOffset = Math.min(...tmpl.fingers.map(f => f.offset));
+        const barreBase = minOffset < 0 ? barFret : rootFret;
+        if (positions.some(p => p.fret > 0 && p.fret < barreBase)) continue; // (a)
+        if (positions.filter(p => p.fret > barreBase).length > 3)   continue; // (b)
       } else {
         // Open chord / power chord: no barre, so all 4 fingers are free.
         if (positions.filter(p => p.fret > 0).length > 4) continue;
