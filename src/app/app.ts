@@ -225,14 +225,20 @@ export class App {
     const cagedMatch = region?.id.match(/^caged-([a-g])/);
     const shapeId    = cagedMatch ? cagedMatch[1].toUpperCase() : undefined;
 
-    this.activeChordVoicing = findBestShape(
-      this.activeHighlightedChord.chordRootPc,
-      this.activeHighlightedChord.intervals,
-      this.activeHighlightedChord.name,
-      targetFret,
-      this.selectedTuning,
-      shapeId,
-    );
+    // If the locked shape has no template for this chord quality (e.g. G-shape minor),
+    // fall back to finding the nearest voicing of any shape near the same fret range.
+    this.activeChordVoicing =
+      findBestShape(
+        this.activeHighlightedChord.chordRootPc,
+        this.activeHighlightedChord.intervals,
+        this.activeHighlightedChord.name,
+        targetFret, this.selectedTuning, shapeId,
+      ) ?? (shapeId ? findBestShape(
+        this.activeHighlightedChord.chordRootPc,
+        this.activeHighlightedChord.intervals,
+        this.activeHighlightedChord.name,
+        targetFret, this.selectedTuning,
+      ) : null);
   }
 
   private recomputeRegions(): void {

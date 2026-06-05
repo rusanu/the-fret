@@ -20,8 +20,8 @@ function withHigh(r: Region): Region[] {
     endFret:   (r.endFret   + 12) % 24,
   };
   const results: Region[] = [];
-  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret < r.endFret) results.push(r); else console.log('rejected r:', r);
-  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret < hi.endFret ) results.push(hi); else console.log('rejected hi:', hi, r);
+  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret < r.endFret) results.push(r);
+  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret < hi.endFret) results.push(hi);
   return results;
 }
 
@@ -36,15 +36,15 @@ export function computeRegions(rootPc: number, tuning: readonly string[]): Regio
     { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 2,              endFret: R + 5  },
     { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4,              endFret: R + 8  },
     { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 7,              endFret: R + 10 },
-    { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R - 3, endFret: R },
+    { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9,              endFret: R + 12 },
   ];
 
   const cagedBase: Region[] = [
     { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R,                  endFret: R + 3  },
     { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 2,              endFret: R + 5  },
     { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 4,              endFret: R + 8  },
-    { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 7,              endFret: R + 11 },
-    { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R + 10,             endFret: R + 14 },
+    { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 7,              endFret: R + 10 },
+    { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R + 9,              endFret: R + 12 },
   ];
 
   const blues: Region[] = [

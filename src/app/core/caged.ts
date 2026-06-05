@@ -216,6 +216,7 @@ export function findBestShape(
         // For E/A/D: barFret === rootFret, so alternate-tuning artifacts that land below
         // rootFret are still rejected (same as before).
         // For G/C: barFret < rootFret, so the intentional low-fret fingers are accepted.
+        const barFret   = frettedFrets.length ? Math.min(...frettedFrets) : rootFret;
         const minOffset = Math.min(...tmpl.fingers.map(f => f.offset));
         const barreBase = minOffset < 0 ? barFret : rootFret;
         if (positions.some(p => p.fret > 0 && p.fret < barreBase)) continue; // (a)
