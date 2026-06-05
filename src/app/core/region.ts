@@ -37,7 +37,20 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
 
   console.log(setDef.name, rootPc, setDef, R, tuning);
 
-  if (setDef.name == 'Minor pentatonic') {
+  
+  if (setDef.name == 'BB King') {
+    const base: Region[] = [
+      { id: 'bbk', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R+5,     endFret: R + 9  },
+    ];
+    return base.flatMap(withHigh);
+  }
+  else if (setDef.name == 'Alfred King') {
+    const base: Region[] = [
+      { id: 'pent2', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R + 3, endFret: R + 5  },
+    ];
+    return base.flatMap(withHigh);
+  }
+  else if (setDef.name == 'Minor pentatonic') {
     const base: Region[] = [
       { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R,     endFret: R + 3  },
       { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 2, endFret: R + 5  },
@@ -46,13 +59,7 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
       { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
     ];
     return base.flatMap(withHigh);
-  }
-  if (setDef.name == 'BB King') {
-    const base: Region[] = [
-      { id: 'bbk', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R+5,     endFret: R + 9  },
-    ];
-    return base.flatMap(withHigh);
-  }
+  }  
   else if (setDef.name == 'Major pentatonic') {
     const base: Region[] = [
       { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R - 1, endFret: R + 2  },
