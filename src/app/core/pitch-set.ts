@@ -37,6 +37,7 @@ export const PITCH_SET_LIBRARY: readonly PitchSetDef[] = [
   { name: 'm7b5 (half-dim)',  intervals: [0,3,6,10],        category: 'arpeggio' },
   { name: 'Dim 7',            intervals: [0,3,6,9],         category: 'arpeggio' },
   { name: 'Minor/Maj 7',      intervals: [0,3,7,11],        category: 'arpeggio' },
+  { name: 'Metal (5)',        intervals: [0,7],              category: 'arpeggio', strings: [5,6] },
 ];
 
 export const DEGREE_NAMES = ['1','b2','2','b3','3','4','b5','5','b6','6','b7','7'] as const;
