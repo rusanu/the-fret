@@ -104,6 +104,13 @@
   .note-dot.chord-fade { opacity: 0.18; }
 }
 
+// Open-string voicing dot: dashed outline, no fill — same convention as scale view
+.voicing-dot.voicing-open {
+  fill: none;
+  stroke-width: 1.5;
+  stroke-dasharray: 2 2;
+}
+
 // Voicing barre bar (index finger / capo position)
 .voicing-barre {
   fill: #b0b0b0;

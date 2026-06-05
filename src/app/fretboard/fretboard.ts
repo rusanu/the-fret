@@ -31,6 +31,7 @@ interface VoicingDot {
   tone: string;
   noteName: string;
   isRoot: boolean;
+  isOpen: boolean;
 }
 
 interface MutedMarker {
@@ -200,7 +201,7 @@ export class FretboardComponent implements OnInit, OnChanges {
       }
 
       this.voicingDots = positions
-        .filter(p => p.fret > 0 && !(isMovable && p.fret === barFret))
+        .filter(p => !(isMovable && p.fret === barFret)) // exclude barre positions
         .map(p => ({
           id: `v${p.string}`,
           cx: this.nx(p.fret),
@@ -208,6 +209,7 @@ export class FretboardComponent implements OnInit, OnChanges {
           tone: p.tone,
           noteName: noteNameAt(p.string, p.fret, this.tuning),
           isRoot: p.tone === '1',
+          isOpen: p.fret === 0,
         }));
       this.mutedMarkers = this.voicing.mutedStrings.map(s => ({
         id: `mx${s}`, cx: this.nx(0), cy: this.ny(s),

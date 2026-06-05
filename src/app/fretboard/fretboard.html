@@ -101,6 +101,7 @@
         <circle
           [attr.cx]="dot.cx" [attr.cy]="dot.cy" [attr.r]="DOT_R"
           [class.voicing-root]="dot.isRoot"
+          [class.voicing-open]="dot.isOpen"
           class="voicing-dot"
         />
         @if (showNoteLabels) {
