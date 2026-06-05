@@ -175,6 +175,7 @@ export class FretboardComponent implements OnInit, OnChanges {
       const x = this.LW + r.startFret * this.FW;
       const w = (r.endFret - r.startFret + 1) * this.FW;
       const cell: BandCell = { id: r.id, label: r.shortLabel, x, w, y: 0, h: this.BAND_H, isSelected: r.id === this.selectedRegionId, region: r };
+      if (cell.w <= 0) console.log('bad cell:', cell, r);
       if (r.group === 'pentatonic') { cell.y = this.pentBandY; this.pentBandCells.push(cell); }
       else                          { cell.y = this.cagedBandY; this.cagedBandCells.push(cell); }
     }

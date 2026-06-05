@@ -16,12 +16,12 @@ function withHigh(r: Region): Region[] {
     ...r,
     id: r.id + 'h',
     name: r.name + ' ↑',
-    startFret: r.startFret + 12,
-    endFret:   r.endFret   + 12,
+    startFret: (r.startFret + 12) % 24,
+    endFret:   (r.endFret   + 12) % 24,
   };
   const results: Region[] = [];
-  if (r.startFret >= 0 && r.endFret <= 24) results.push(r);
-  if (hi.startFret >= 0 && hi.endFret <= 24) results.push(hi);
+  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret < r.endFret) results.push(r); // else console.log('rejected r:', r);
+  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret < hi.endFret ) results.push(hi); // else console.log('rejected hi:', hi, r);
   return results;
 }
 
