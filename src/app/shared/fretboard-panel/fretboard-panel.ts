@@ -28,6 +28,14 @@ export { STANDARD_TUNING }; // re-export for panel creation convenience
 })
 export class FretboardPanelComponent {
   @Input() panel!: FretboardPanel;
+  @Input() currentTuning: Tuning = STANDARD_TUNING;
   @Output() close            = new EventEmitter<string>();
   @Output() addToProgression = new EventEmitter<Voicing>();
+
+  get canAddToProgression(): boolean {
+    if (this.panel.type !== 'voicing' || !this.panel.voicing) return false;
+    // Panel tuning must match the active tuning — cross-tuning progressions are unplayable.
+    return this.panel.tuning.length === this.currentTuning.length &&
+           this.panel.tuning.every((s, i) => s === this.currentTuning[i]);
+  }
 }

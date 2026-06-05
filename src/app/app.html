@@ -74,6 +74,7 @@
     @for (panel of panels; track panel.id) {
       <app-fretboard-panel
         [panel]="panel"
+        [currentTuning]="selectedTuning"
         (close)="onRemovePanel($event)"
         (addToProgression)="onAddVoicingToProgression($event)"
       />
