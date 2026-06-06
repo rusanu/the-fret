@@ -8,7 +8,7 @@ export interface DiatonicChord {
   pitchClasses: Set<number>;
 }
 
-const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII'];
+const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
 // Return the interval (semitones above scale root) for scale degree `degree`,
 // wrapping correctly into the next octave when degree >= intervals.length.
@@ -26,8 +26,8 @@ function triadQuality(third: number, fifth: number): TriadQuality {
   return 'dim'; // m3 + d5
 }
 
-// Compute the 7 diatonic triads for a scale.  Only meaningful for scales
-// with ≥ 5 notes; caller should filter (typically require length === 7).
+// Compute the any diatonic triads for a scale.  Only meaningful for scales
+// with ≥ 5 notes; caller should filter (
 export function getDiatonicTriads(
   scaleRootPc: number,
   scaleIntervals: readonly number[],
@@ -45,7 +45,7 @@ export function getDiatonicTriads(
     const rootName = NOTE_NAMES_COMMON[chordRootPc];
 
     const qualSuffix    = quality === 'min' ? 'm' : quality === 'dim' ? '°' : quality === 'aug' ? '+' : '';
-    const numeralBase   = ROMAN[i % 7] ?? String(i + 1);
+    const numeralBase   = ROMAN[i % n] ?? String(i + 1);
     const numeralSuffix = quality === 'dim' ? '°' : quality === 'aug' ? '+' : '';
     const numeral       = (quality === 'maj' || quality === 'aug')
       ? `${numeralBase}${numeralSuffix}`

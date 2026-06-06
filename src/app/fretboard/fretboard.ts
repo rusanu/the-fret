@@ -248,7 +248,7 @@ export class FretboardComponent implements OnInit, OnChanges {
       }
 
       this.voicingDots = positions
-        .filter(p => !(isMovable && p.fret === barFret)) // exclude barre positions
+        //.filter(p => !(isMovable && p.fret === barFret)) // exclude barre positions
         .map(p => ({
           id: `v${p.string}`,
           cx: this.nx(p.fret),
