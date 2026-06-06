@@ -23,8 +23,8 @@ function withHigh(r: Region): Region[] {
     endFret:  r.endFret == 12 ? 24 :  (r.endFret   + 12) % 24,
   };
   const results: Region[] = [];
-  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret < r.endFret) results.push(r);
-  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret < hi.endFret) results.push(hi);
+  if (r.startFret >= 0 && r.endFret <= 24 && r.startFret <= r.endFret) results.push(r);
+  if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret <= hi.endFret) results.push(hi);
 
   if (results.length < 2) console.log(r , hi, results);
   return results;
@@ -35,9 +35,6 @@ function withHigh(r: Region): Region[] {
 export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: readonly string[]): Region[] {
   const R = fretForPitchClass(rootPc, 6, tuning); // root fret on string 6
 
-  console.log(setDef.name, rootPc, setDef, R, tuning);
-
-  
   if (setDef.name == 'BB King') {
     const base: Region[] = [
       { id: 'bbk', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R+5,     endFret: R + 9  },
@@ -58,7 +55,14 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
       { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 7, endFret: R + 10 },
       { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
     ];
-    return base.flatMap(withHigh);
+    const caged: Region[] = [
+      { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R,      endFret: R      },
+      { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R + 2,  endFret: R + 3  },
+      { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R + 4,  endFret: R + 5  },
+      { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 7,  endFret: R + 8  },
+      { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 8,  endFret: R + 10  },
+    ];
+    return [...base.flatMap(withHigh), ...caged.flatMap(withHigh)];
   }  
   else if (setDef.name == 'Major pentatonic') {
     const base: Region[] = [
@@ -68,7 +72,14 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
       { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 6, endFret: R + 9 },
       { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
     ];
-    return base.flatMap(withHigh);    
+    const caged: Region[] = [
+      { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R - 1,  endFret: R  },
+      { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R + 1,  endFret: R + 2  },
+      { id: 'caged-d', shortLabel: 'D', name: 'D shape', group: 'caged', startFret: R + 4,  endFret: R + 5  },
+      { id: 'caged-c', shortLabel: 'C', name: 'C shape', group: 'caged', startFret: R + 5,  endFret: R + 7  },
+      { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R + 9,  endFret: R + 9 },
+    ];
+    return [...base.flatMap(withHigh), ...caged.flatMap(withHigh)];
   }
   else if (setDef.category == 'scale' && setDef.intervals.length == 7) {
     const base: Region[] = [

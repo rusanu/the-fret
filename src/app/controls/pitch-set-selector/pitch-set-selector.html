@@ -5,6 +5,11 @@
       <option [value]="entry.name">{{ entry.name }}</option>
     }
   </optgroup>
+  <optgroup label="Blues">
+    @for (entry of blues; track entry.name) {
+      <option [value]="entry.name">{{ entry.name }}</option>
+    }
+  </optgroup>  
   <optgroup label="Modes">
     @for (entry of modes; track entry.name) {
       <option [value]="entry.name">{{ entry.name }}</option>

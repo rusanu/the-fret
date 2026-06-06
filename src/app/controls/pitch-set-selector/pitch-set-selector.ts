@@ -13,6 +13,7 @@ export class PitchSetSelectorComponent {
   readonly scales    = PITCH_SET_LIBRARY.filter(p => p.category === 'scale');
   readonly modes     = PITCH_SET_LIBRARY.filter(p => p.category === 'mode');
   readonly arpeggios = PITCH_SET_LIBRARY.filter(p => p.category === 'arpeggio');
+  readonly blues = PITCH_SET_LIBRARY.filter(p => p.category === 'blues');
 
   private readonly lookup = new Map(PITCH_SET_LIBRARY.map(p => [p.name, p]));
 
