@@ -19,14 +19,17 @@ function withHigh(r: Region): Region[] {
     ...r,
     id: r.id + 'h',
     name: r.name + ' ↑',
-    startFret: (r.startFret + 12) % 24,
+    startFret: r.startFret == 12 ? 24 : (r.startFret + 12) % 24,
     endFret:  r.endFret == 12 ? 24 :  (r.endFret   + 12) % 24,
   };
   const results: Region[] = [];
   if (r.startFret >= 0 && r.endFret <= 24 && r.startFret <= r.endFret) results.push(r);
   if (hi.startFret >= 0 && hi.endFret <= 24 && hi.startFret <= hi.endFret) results.push(hi);
 
-  if (results.length < 2) console.log(r , hi, results);
+  //if (r.endFret - r.startFret > 5) console.log(r.name, r);
+  //if (hi.endFret - hi.startFret > 5) console.log(r.name, hi, r);
+  //if (results.length < 2) console.log(r , hi, results);
+  
   return results;
 }
 
