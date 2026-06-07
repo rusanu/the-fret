@@ -33,6 +33,26 @@ function withHigh(r: Region): Region[] {
   return results;
 }
 
+function minorPentatonic(R:number):Region[] {
+return [
+      { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R,     endFret: R + 3  },
+      { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 2, endFret: R + 5  },
+      { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4, endFret: R + 8  },
+      { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 7, endFret: R + 10 },
+      { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
+    ];  
+}
+
+function majorPentatonic(R:number): Region[] {
+  return [
+      { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R - 1, endFret: R + 2  },
+      { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 1, endFret: R + 5  },
+      { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4, endFret: R + 7  },
+      { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 6, endFret: R + 9 },
+      { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
+    ];  
+}
+
 // Compute all named regions for a given root.
 // Both low and high-octave (+12 frets) variants are included where they fit (0–24).
 export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: readonly string[]): Region[] {
@@ -50,14 +70,10 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
     ];
     return base.flatMap(withHigh);
   }
+  else if (setDef.name == 'Minor blues') return minorPentatonic(R).flatMap(withHigh);
+  else if (setDef.name == 'Major blues') return majorPentatonic(R).flatMap(withHigh);
   else if (setDef.name == 'Minor pentatonic') {
-    const base: Region[] = [
-      { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R,     endFret: R + 3  },
-      { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 2, endFret: R + 5  },
-      { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4, endFret: R + 8  },
-      { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 7, endFret: R + 10 },
-      { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
-    ];
+    const base: Region[] = minorPentatonic(R);
     const caged: Region[] = [
       { id: 'caged-a', shortLabel: 'A', name: 'A shape', group: 'caged', startFret: R,      endFret: R      },
       { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R + 2,  endFret: R + 3  },
@@ -68,13 +84,7 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
     return [...base.flatMap(withHigh), ...caged.flatMap(withHigh)];
   }  
   else if (setDef.name == 'Major pentatonic') {
-    const base: Region[] = [
-      { id: 'pent1', shortLabel: '1', name: 'Box 1', group: 'pentatonic', startFret: R - 1, endFret: R + 2  },
-      { id: 'pent2', shortLabel: '2', name: 'Box 2', group: 'pentatonic', startFret: R + 1, endFret: R + 5  },
-      { id: 'pent3', shortLabel: '3', name: 'Box 3', group: 'pentatonic', startFret: R + 4, endFret: R + 7  },
-      { id: 'pent4', shortLabel: '4', name: 'Box 4', group: 'pentatonic', startFret: R + 6, endFret: R + 9 },
-      { id: 'pent5', shortLabel: '5', name: 'Box 5', group: 'pentatonic', startFret: R + 9, endFret: R + 12 },
-    ];
+    const base: Region[] = majorPentatonic(R);
     const caged: Region[] = [
       { id: 'caged-g', shortLabel: 'G', name: 'G shape', group: 'caged', startFret: R - 1,  endFret: R  },
       { id: 'caged-e', shortLabel: 'E', name: 'E shape', group: 'caged', startFret: R + 1,  endFret: R + 2  },

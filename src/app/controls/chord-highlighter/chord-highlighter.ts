@@ -20,7 +20,7 @@ export class ChordHighlighterComponent implements OnChanges {
   selectedChord: DiatonicChord | null = null;
 
   get isVisible(): boolean {
-    return (this.highlightSet?.intervals.length ?? 0) >= 4;
+    return (this.highlightSet?.intervals.length ?? 0) >= 4 && !this.highlightSet?.strings;
   }
 
   ngOnChanges(changes: SimpleChanges): void {

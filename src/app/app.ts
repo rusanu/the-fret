@@ -217,26 +217,26 @@ export class App {
     const region = this.activeRegion;
     // Use the center of the region as the anchor fret so the distance
     // calculation favours voicings inside the region rather than those near fret 0.
-    const targetFret = region
-      ? Math.round((region.startFret + region.endFret) / 2)
-      : 5;
+    const targetFret = region ? region.startFret : 0;
 
-    // Derive the CAGED shape from the region:
-    // – CAGED regions: extract shape letter from the id ('caged-a' → 'A')
-    // – Pentatonic boxes: map to corresponding CAGED shape (Box1=E, Box2=D, Box3=C, Box4=A, Box5=G)
-    //   This is the fundamental CAGED/pentatonic equivalence — each box occupies the same neck
-    //   region as its corresponding CAGED chord shape.
-    const PENT_TO_SHAPE: Record<string, string> = {
-      'pent1': 'E', 'pent1h': 'E',
-      'pent2': 'D', 'pent2h': 'D',
-      'pent3': 'C', 'pent3h': 'C',
-      'pent4': 'A', 'pent4h': 'A',
-      'pent5': 'G', 'pent5h': 'G',
-    };
-    const cagedMatch = region?.id.match(/^caged-([a-g])/);
-    const shapeId    = cagedMatch
-      ? cagedMatch[1].toUpperCase()
-      : (region ? PENT_TO_SHAPE[region.id] : undefined);
+    // // Derive the CAGED shape from the region:
+    // // – CAGED regions: extract shape letter from the id ('caged-a' → 'A')
+    // // – Pentatonic boxes: map to corresponding CAGED shape (Box1=E, Box2=D, Box3=C, Box4=A, Box5=G)
+    // //   This is the fundamental CAGED/pentatonic equivalence — each box occupies the same neck
+    // //   region as its corresponding CAGED chord shape.
+    // const PENT_TO_SHAPE: Record<string, string> = {
+    //   'pent1': 'E', 'pent1h': 'E',
+    //   'pent2': 'D', 'pent2h': 'D',
+    //   'pent3': 'C', 'pent3h': 'C',
+    //   'pent4': 'A', 'pent4h': 'A',
+    //   'pent5': 'G', 'pent5h': 'G',
+    // };
+    // const cagedMatch = region?.id.match(/^caged-([a-g])/);
+    // const shapeId    = cagedMatch
+    //   ? cagedMatch[1].toUpperCase()
+    //   : (region ? PENT_TO_SHAPE[region.id] : undefined);
+
+    const shapeId = undefined;
 
     // If the locked shape has no template for this chord quality (e.g. G-shape minor),
     // fall back to finding the nearest voicing of any shape near the same fret range.
