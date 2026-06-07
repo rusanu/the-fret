@@ -2,7 +2,7 @@
 
 An interactive visual guide to the guitar fretboard.
 
-![Deploy to GitHub Pages](https://github.com/rremus/the-fret/actions/workflows/deploy.yml/badge.svg)
+[![Deploy to GitHub Pages](https://github.com/rusanu/the-fret/actions/workflows/deploy.yml/badge.svg)](https://github.com/rusanu/the-fret/actions/workflows/deploy.yml)
 
 **Live:** https://rusanu.com/the-fret/
 
