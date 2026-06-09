@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { Voicing } from '../../core/caged';
+import { maxStringOnFret, Voicing } from '../../core/caged';
 
 interface Dot    { cx: number; cy: number; isRoot: boolean; }
 interface Marker { x: number; y: number; symbol: string; isX: boolean; }
@@ -101,7 +101,12 @@ export class MiniVoicingComponent implements OnChanges {
         cy: this.dotY(this.startFret),
       };
     } else {
-      this.barre = null;
+      this.barre = this.voicing.barreFret ? {
+          //x1: this.strX(this.voicing.rootString),
+          x1: this.strX(maxStringOnFret(this.voicing.barreFret, this.voicing.positions)),
+          x2: this.strX(1),
+          cy: this.dotY(this.startFret),
+        } : null;      
     }
 
     // ── Finger dots ────────────────────────────────────────────────────────

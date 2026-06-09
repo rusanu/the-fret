@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { noteAt, noteNameAt } from '../core/pitch';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
-import { Voicing } from '../core/caged';
+import { maxStringOnFret, Voicing } from '../core/caged';
 import { Region } from '../core/region';
 import { STANDARD_TUNING } from '../core/tuning';
 
@@ -244,7 +244,12 @@ export class FretboardComponent implements OnInit, OnChanges {
           y2: this.ny(rootStr) + this.DOT_R, // rootStr = bottom of barre
         };
       } else {
-        this.voicingBarre = null;
+
+        this.voicingBarre = this.voicing.barreFret ? {
+          cx: this.nx(this.voicing.barreFret!),
+          y1: this.ny(1) - this.DOT_R,
+          y2: this.ny(maxStringOnFret(this.voicing.barreFret, this.voicing.positions)) + this.DOT_R,
+        } : null;
       }
 
       this.voicingDots = positions

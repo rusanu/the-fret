@@ -9,6 +9,8 @@ const TONE_SEMITONES: Record<string, number> = {
   'b5': 6, '5': 7, 'b6': 8, '6': 9, 'b7': 10, '7': 11,
 };
 
+const TONE_NAMES: string[] = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'];
+
 // Find the fret on `stringNum` that sounds `targetPc`, picking the occurrence
 // closest to `guideFret` (the fret the standard-tuning template would suggest).
 // Returns -1 when no valid fret exists within one octave of guideFret.
@@ -42,9 +44,10 @@ export interface VoicingPosition {
 }
 
 export interface Voicing {
-  shape: string | null;
+  shape?: string | null;
   rootFret: number;
   rootString: number;
+  barreFret?: number | null;
   label: string;
   positions: VoicingPosition[];
   mutedStrings: number[];
@@ -318,9 +321,14 @@ export function findVoicing(chordRootPc: number,
     }
 
   function canBeVoiced(vcs:VoicingCandidate[]):boolean {
+    const topS = vcs.reduce((acc, vc) => Math.min(acc, vc.string), 7);
+    const bottomS = vcs.reduce((acc, vc) => Math.max(acc, vc.string), 0);
+
     // must be either top N strings or bottom N strings
-    if ((vcs[0].string == 1) && (vcs[vcs.length-1].string != vcs.length)) return false;
-    if ((vcs[vcs.length-1].string == 6) && (vcs[0].string != 7-vcs.length)) return false;
+    // allow for thumb muttin on 6
+    if (topS != 1 && bottomS < 5) return false;
+    if ((topS == 1) && (bottomS != vcs.length)) return false;
+    if ((bottomS == 6) && (topS != 7 - vcs.length)) return false;
 
     // now count the required fingers/fret
     // One can barre first fret (index) up to all strings
@@ -356,25 +364,39 @@ export function findVoicing(chordRootPc: number,
     return cnt <= 4;
   }
 
+  function isLowestRoot(vcs:VoicingCandidate[]):boolean {
+    var rootString = vcs.reduce((acc, n) => Math.max(acc, n.pitch == chordRootPc ? n.string : 0), 0);
+    var lowestString = vcs.reduce((acc, n) => Math.max(acc, n.string), 0);
+    return rootString == lowestString;
+  }
+
   const pos = candidates(Array.from(chordPitches), [], 1, Array.from(voicingCandidates));
   var all = Array.from(pos);
-  var good = all.filter(canBeVoiced)
-      .sort((a,b) => b.length - a.length);
+  var voiced = all.filter(canBeVoiced);
+  var good =  voiced.filter(isLowestRoot);
+
+  if (good.length == 0) {
+    // Fallback to any voicing, even if root is not lowest
+    good = voiced;
+  }
 
   if (good.length == 0) {
     return null;
   }
 
+  good.sort((a,b) => b.length - a.length);
+
   var best = good[0];
 
-  return buildVoicing(chordRootPc, chordName, best);
+  return buildVoicing(chordRootPc, chordName, intervals, best);
 }
 
-export function buildVoicing(chordRootPc: number, chordName: string, notes: VoicingCandidate[]):Voicing | null {
+export function buildVoicing(chordRootPc: number, chordName: string, intervals:readonly number[], notes: VoicingCandidate[]):Voicing | null {
   var rootString = 0, rootFret = 0, minFret = 24, shape: string | null = null;
   var mutedStrings= [1,2,3,4,5,6];
   var positions:VoicingPosition[] = [];
-
+  var minCnt = 0;
+  
   for(var note of notes){
     if (note.pitch == chordRootPc) {
       if (!rootString || rootString < note.string) {
@@ -385,6 +407,9 @@ export function buildVoicing(chordRootPc: number, chordName: string, notes: Voic
 
     if (note.fret < minFret) {
       minFret = note.fret;
+      minCnt = 1;
+    } else if (note.fret == minFret) {
+      minCnt += 1;
     }
 
     var idx = mutedStrings.indexOf(note.string);
@@ -395,7 +420,7 @@ export function buildVoicing(chordRootPc: number, chordName: string, notes: Voic
     positions.push({
       string: note.string,
       fret: note.fret,
-      tone: NOTE_NAMES_COMMON[note.pitch]
+      tone: toneInScale(note.pitch, chordRootPc, intervals)
     });
   }
 
@@ -405,6 +430,16 @@ export function buildVoicing(chordRootPc: number, chordName: string, notes: Voic
     label: chordName,
     shape: shape,
     positions: positions,
+    barreFret: minCnt > 1 ? minFret : null,
     mutedStrings: mutedStrings
   };
+}
+
+export function toneInScale(pitch: number, chordRootPc:number, intervals:readonly number[]):string {
+  const distance = (pitch + 12 - chordRootPc) % 12;
+  return TONE_NAMES[distance];
+}
+
+export function maxStringOnFret(fret:number, positions:VoicingPosition[]) {
+  return positions.reduce((acc:number, vp:VoicingPosition) => vp.fret == fret ? Math.max(vp.string, acc) : acc, 0);
 }
