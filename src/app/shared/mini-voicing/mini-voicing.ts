@@ -89,7 +89,7 @@ export class MiniVoicingComponent implements OnChanges {
     // Open chords: fret coincidences are not barre fingers.
     // Power chords: root-only index, no cross-string barre.
     const CAGED     = new Set(['E', 'A', 'D', 'C', 'G']);
-    const isMovable = !hasOpen && CAGED.has(this.voicing.shape);
+    const isMovable = !hasOpen && this.voicing.shape && CAGED.has(this.voicing.shape);
 
     if (isMovable) {
       // Barre spans from rootString (lowest pitch = leftmost in chord diagram)

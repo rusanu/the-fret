@@ -7,7 +7,7 @@
 <div class="controls-bar">
   <div class="control-group">
     <span class="control-label">Root</span>
-    <app-root-selector [inSetPcs]="inSetPcs" (rootSelected)="onRootSelected($event)" />
+    <app-root-selector [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" (rootSelected)="onRootSelected($event)" />
   </div>
   <div class="control-group">
     <span class="control-label">Scale / Arpeggio</span>
@@ -53,10 +53,12 @@
   </div>
 </main>
 
+<!-- 
 <div class="chord-bar">
   <span class="control-label">Chord finder</span>
   <app-chord-finder [noResult]="chordNoResult" (findChord)="onChordFind($event)" />
 </div>
+-->
 
 <app-progression-player
   [items]="progressionItems"

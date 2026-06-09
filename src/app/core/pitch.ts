@@ -27,3 +27,5 @@ export function fretForPitchClass(rootPc: number, stringNum: number, tuning: rea
 export function noteNameAt(stringNum: number, fret: number, tuning: readonly string[]): string {
   return NOTE_NAMES_COMMON[noteAt(stringNum, fret, tuning)];
 }
+
+

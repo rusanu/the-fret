@@ -231,7 +231,7 @@ export class FretboardComponent implements OnInit, OnChanges {
       // Open chords: strings share frets by coincidence — no barre finger.
       // Power chords: index finger plays root only, no cross-string barre.
       const CAGED        = new Set(['E', 'A', 'D', 'C', 'G']);
-      const isMovable    = !hasOpenStr && CAGED.has(this.voicing.shape);
+      const isMovable    = !hasOpenStr && this.voicing.shape && CAGED.has(this.voicing.shape);
 
       if (isMovable) {
         // Barre spans from the shape's root string (lowest pitch in barre, largest string number)

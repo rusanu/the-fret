@@ -34,12 +34,21 @@
     background: #1a5c8a;
     border-color: #3a9fd0;
     color: #dde8ff;
+    &.in-chord {
+      border-color: #2a8060;
+      background: #1a3a28;    
+    }
   }
+
 
   &.active {
     background: #c8a84b;
     border-color: #c8a84b;
     color: #0f0f0f;
     font-weight: 700;
+    &.in-chord {
+      border-color: #2a8060;
+      background: #abc84b;    
+    }
   }
 }

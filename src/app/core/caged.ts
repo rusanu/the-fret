@@ -1,4 +1,7 @@
-import { fretForPitchClass, NOTE_NAMES_COMMON } from './pitch';
+import { fretForPitchClass, NOTE_NAMES_COMMON, noteAt } from './pitch';
+import { pitchesInSet, PitchSetDef } from './pitch-set';
+import { Region } from './region';
+import { Tuning } from './tuning';
 
 // Semitone interval above chord root for each tone label
 const TONE_SEMITONES: Record<string, number> = {
@@ -26,6 +29,12 @@ function tuningAwareFret(
   return fret;
 }
 
+export interface VoicingCandidate {
+  string: number;
+  fret: number;
+  pitch: number;
+}
+
 export interface VoicingPosition {
   string: number;  // 1–6
   fret: number;
@@ -33,7 +42,7 @@ export interface VoicingPosition {
 }
 
 export interface Voicing {
-  shape: string;
+  shape: string | null;
   rootFret: number;
   rootString: number;
   label: string;
@@ -246,4 +255,156 @@ export function findBestShape(
   }
 
   return best;
+}
+
+  
+export function findVoicing(chordRootPc: number, 
+  intervals: readonly number[], 
+  chordName: string,
+  activeRegion: Region, 
+  scale: PitchSetDef,
+  selectedTuning: Tuning): Voicing | null {
+  const chordPitches = pitchesInSet(chordRootPc, intervals);
+
+  let voicingCandidates = new Set<VoicingCandidate>();
+
+  for (let s=1;s<=selectedTuning.length; ++s) {
+    for (let f = activeRegion.startFret;f<=activeRegion.endFret;++f)
+    {
+      const note = noteAt(s, f, selectedTuning);
+      if (chordPitches.has(note)) {
+        const vp:VoicingCandidate = {
+          string: s,
+          fret: f,
+          pitch: note
+        };
+        voicingCandidates.add(vp);
+      }
+    }
+  }
+
+  function* candidates(
+    pitches:number[], 
+    found: number[],
+    string: number,
+    positions:VoicingCandidate[]):Iterable<VoicingCandidate[]> {
+
+      if (string > 6) {
+        return;
+      }
+
+      const cand = positions.filter(p => p.string == string);
+
+      for(var p of cand) {
+        if (!pitches.includes(p.pitch)) {
+          continue;
+        }
+
+        const newFound = found.includes(p.pitch) ? found :  [p.pitch, ...found];
+
+        const rest = candidates(pitches, newFound, string + 1, positions);
+
+        for (const r of rest) {
+          yield [p, ...r];
+        }
+
+        if (newFound.length == pitches.length) {
+          yield [p];          
+        }
+      }
+
+      // finally emit *if we mute this string* 
+      yield* candidates(pitches, found, string + 1, positions);
+    }
+
+  function canBeVoiced(vcs:VoicingCandidate[]):boolean {
+    // must be either top N strings or bottom N strings
+    if ((vcs[0].string == 1) && (vcs[vcs.length-1].string != vcs.length)) return false;
+    if ((vcs[vcs.length-1].string == 6) && (vcs[0].string != 7-vcs.length)) return false;
+
+    // now count the required fingers/fret
+    // One can barre first fret (index) up to all strings
+    // One can barre 2-3 strings with other fingers too but will skip for now
+    // 
+   
+    const fretFingers = vcs.reduce((acc, vc) => {
+       var crt = acc.get(vc.fret) ?? 0;
+       acc.set(vc.fret, crt + 1);
+       return acc;
+    }, new Map<number,number>());
+
+    // Stupid JS string number sort
+    const frets = Array.from(fretFingers.keys()).sort((a,b) => a-b);
+
+    if (frets.length > 4) return false;
+
+    var cnt = 0;
+    var last = frets[0];
+    for(var i = 0; i<frets.length; ++i) {
+      var fret = frets[i];
+      if (fret < last) {
+        console.error('sort!', fret, last, frets, fretFingers);
+      }
+      // can't spread fingers too wide
+      if (fret - last > 2) return false;
+      // first fret can be a barre
+      cnt +=  i==0 ? 1 : fretFingers.get(frets[i])!;
+      last = fret;
+    }
+
+    // We can use at most 4 fingers
+    return cnt <= 4;
+  }
+
+  const pos = candidates(Array.from(chordPitches), [], 1, Array.from(voicingCandidates));
+  var all = Array.from(pos);
+  var good = all.filter(canBeVoiced)
+      .sort((a,b) => b.length - a.length);
+
+  if (good.length == 0) {
+    return null;
+  }
+
+  var best = good[0];
+
+  return buildVoicing(chordRootPc, chordName, best);
+}
+
+export function buildVoicing(chordRootPc: number, chordName: string, notes: VoicingCandidate[]):Voicing | null {
+  var rootString = 0, rootFret = 0, minFret = 24, shape: string | null = null;
+  var mutedStrings= [1,2,3,4,5,6];
+  var positions:VoicingPosition[] = [];
+
+  for(var note of notes){
+    if (note.pitch == chordRootPc) {
+      if (!rootString || rootString < note.string) {
+        rootString = note.string;
+        rootFret = note.fret;
+      }
+    }
+
+    if (note.fret < minFret) {
+      minFret = note.fret;
+    }
+
+    var idx = mutedStrings.indexOf(note.string);
+    if (idx > -1) {
+      mutedStrings.splice(idx, 1);
+    }
+
+    positions.push({
+      string: note.string,
+      fret: note.fret,
+      tone: NOTE_NAMES_COMMON[note.pitch]
+    });
+  }
+
+  return {
+    rootFret: rootFret,
+    rootString: rootString,
+    label: chordName,
+    shape: shape,
+    positions: positions,
+    mutedStrings: mutedStrings
+  };
 }

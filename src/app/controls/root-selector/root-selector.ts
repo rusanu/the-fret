@@ -10,6 +10,7 @@ interface RootButton { name: string; pc: number; dual: boolean; }
 })
 export class RootSelectorComponent {
   @Input() inSetPcs: Set<number> = new Set();
+  @Input() inChordPcs: Set<number> | null = null;
   @Output() rootSelected = new EventEmitter<number | null>();
 
   readonly roots: RootButton[] = [

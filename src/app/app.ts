@@ -10,10 +10,10 @@ import { FretboardPanelComponent, FretboardPanel } from './shared/fretboard-pane
 import { ProgressionPlayerComponent } from './progression/progression-player';
 import { ProgressionItem } from './core/progression-item';
 import { PitchSetDef, pitchesInSet } from './core/pitch-set';
-import { findBestShape, Voicing } from './core/caged';
+import { findBestShape, findVoicing, Voicing, VoicingPosition } from './core/caged';
 import { DiatonicChord } from './core/harmony';
 import { computeRegions, Region } from './core/region';
-import { NOTE_NAMES_COMMON } from './core/pitch';
+import { NOTE_NAMES_COMMON, noteAt } from './core/pitch';
 import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
 
 @Component({
@@ -21,7 +21,7 @@ import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
   standalone: true,
   imports: [FretboardComponent, RootSelectorComponent, PitchSetSelectorComponent,
             TuningSelectorComponent, ChordHighlighterComponent,
-            ChordFinderComponent, FretboardPanelComponent, ProgressionPlayerComponent],
+            /*ChordFinderComponent, */ FretboardPanelComponent, ProgressionPlayerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -138,7 +138,7 @@ export class App {
     if (!voicing) { this.chordNoResult = true; return; }
     this.chordNoResult = false;
     const rootName = NOTE_NAMES_COMMON[query.rootPc];
-    const shapeTag = App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
+    const shapeTag = voicing?.shape && App.CAGED_SHAPES.has(voicing.shape) ? ` · ${voicing.shape}-shape` : '';
     this.panels = [{
       id: `panel-${++this.nextPanelId}`,
       title: `${rootName} ${query.chordName} near fret ${query.fret}${shapeTag}${this.tuningTag()}`,
@@ -238,9 +238,17 @@ export class App {
 
     const shapeId = undefined;
 
+    this.activeChordVoicing = this.activeRegion && this.selectedSetDef ? findVoicing(
+        this.activeHighlightedChord.chordRootPc,
+        this.activeHighlightedChord.intervals,
+        this.activeHighlightedChord.name,
+        this.activeRegion,
+        this.selectedSetDef,
+        this.selectedTuning) : null;
+
     // If the locked shape has no template for this chord quality (e.g. G-shape minor),
     // fall back to finding the nearest voicing of any shape near the same fret range.
-    this.activeChordVoicing =
+    this.activeChordVoicing ??=
       findBestShape(
         this.activeHighlightedChord.chordRootPc,
         this.activeHighlightedChord.intervals,
@@ -272,3 +280,4 @@ export class App {
     }
   }
 }
+
