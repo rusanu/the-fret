@@ -14,7 +14,7 @@ import { PitchSetDef, pitchesInSet } from './core/pitch-set';
 import { findVoicing, Voicing, VoicingPosition } from './core/voicing';
 import { DiatonicChord } from './core/harmony';
 import { computeRegions, Region } from './core/region';
-import { NOTE_NAMES_COMMON, noteAt } from './core/pitch';
+import { NOTE_NAMES_COMMON, getScaleSpelling, noteAt } from './core/pitch';
 import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
 
 @Component({
@@ -77,6 +77,18 @@ export class App {
   }
 
   get canSave(): boolean { return this.highlightSet !== null; }
+
+  get scaleSpelling(): readonly string[] {
+    return this.highlightSet
+      ? getScaleSpelling(this.highlightSet.root, this.highlightSet.intervals)
+      : NOTE_NAMES_COMMON;
+  }
+
+  // Null until a scale is selected, so root selectors keep showing dual
+  // "C#/Db"-style labels until there's scale context to disambiguate them.
+  get rootSpelling(): readonly string[] | null {
+    return this.highlightSet ? this.scaleSpelling : null;
+  }
 
   get canAddChordHighlightToProgression(): boolean {
     return this.activeChordVoicing !== null;
@@ -161,7 +173,7 @@ export class App {
 
   onSaveMain(): void {
     if (!this.highlightSet) return;
-    const rootName   = NOTE_NAMES_COMMON[this.highlightSet.root];
+    const rootName   = this.scaleSpelling[this.highlightSet.root];
     const scaleName  = this.selectedSetDef?.name ?? '';
     const regionName = this.activeRegion?.name ?? 'All neck';
     this.panels = [{

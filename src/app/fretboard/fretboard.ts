@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { noteAt, noteNameAt } from '../core/pitch';
+import { noteAt, noteNameAt, NOTE_NAMES_COMMON } from '../core/pitch';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
 import { maxStringOnFret, Voicing } from '../core/voicing';
 import { Region } from '../core/region';
@@ -75,6 +75,7 @@ export class FretboardComponent implements OnInit, OnChanges {
   @Input() showDegrees = false;
   @Input() dimUnset = true;
   @Input() highlightSet: HighlightSet | null = null;
+  @Input() noteNames: readonly string[] = NOTE_NAMES_COMMON;
   @Input() activeRegion: Region | null = null;
   @Input() voicing: Voicing | null = null;
   @Input() chordHighlightPcs: Set<number> | null = null;
@@ -126,7 +127,7 @@ export class FretboardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes ||
-        'activeRegion' in changes || 'voicing' in changes ||
+        'activeRegion' in changes || 'voicing' in changes || 'noteNames' in changes ||
         'regionBands' in changes || 'selectedRegionId' in changes) {
       this.rebuild();
     }
@@ -259,7 +260,7 @@ export class FretboardComponent implements OnInit, OnChanges {
           cx: this.nx(p.fret),
           cy: this.ny(p.string),
           tone: p.tone,
-          noteName: noteNameAt(p.string, p.fret, this.tuning),
+          noteName: noteNameAt(p.string, p.fret, this.tuning, this.noteNames),
           isRoot: p.tone === '1',
           isOpen: p.fret === 0,
         }));
@@ -282,7 +283,7 @@ export class FretboardComponent implements OnInit, OnChanges {
     for (let s = 1; s <= 6; s++) {
       for (let f = 0; f <= fc; f++) {
         const pc   = noteAt(s, f, this.tuning);
-        const name = noteNameAt(s, f, this.tuning);
+        const name = noteNameAt(s, f, this.tuning, this.noteNames);
 
         let state: NoteState = 'normal';
         let degree = '';

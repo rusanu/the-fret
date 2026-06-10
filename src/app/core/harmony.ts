@@ -71,6 +71,7 @@ export function getDiatonicChords(
   scaleRootPc: number,
   scaleIntervals: readonly number[],
   extension: ChordExtension = 'triad',
+  spelling: readonly string[] = NOTE_NAMES_COMMON,
 ): DiatonicChord[] {
   const n = scaleIntervals.length;
   if (n < 3) return [];
@@ -82,7 +83,7 @@ export function getDiatonicChords(
     const offsets = degrees.map(d => diatonicInterval(scaleIntervals, i + d) - rootInt);
 
     const chordRootPc = (scaleRootPc + rootInt) % 12;
-    const rootName = NOTE_NAMES_COMMON[chordRootPc];
+    const rootName = spelling[chordRootPc];
 
     // Always derive the triad quality from the actual 3rd/5th, regardless of
     // extension, so the Roman numeral correctly reflects the scale degree.

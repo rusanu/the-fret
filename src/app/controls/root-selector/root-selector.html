@@ -7,6 +7,6 @@
       [class.in-chord]="inChordPcs?.has(root.pc)"
       [class.dual]="root.dual"
       (click)="select(root.pc)"
-    >{{ root.name }}</button>
+    >{{ spelling ? spelling[root.pc] : root.name }}</button>
   }
 </div>

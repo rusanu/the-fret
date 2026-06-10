@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { ChordExtension, DiatonicChord, getDiatonicChords } from '../../core/harmony';
 import { HighlightSet } from '../../fretboard/fretboard';
+import { NOTE_NAMES_COMMON } from '../../core/pitch';
 
 @Component({
   selector: 'app-chord-highlighter',
@@ -10,6 +11,7 @@ import { HighlightSet } from '../../fretboard/fretboard';
 })
 export class ChordHighlighterComponent implements OnChanges {
   @Input() highlightSet: HighlightSet | null = null;
+  @Input() spelling: readonly string[] = NOTE_NAMES_COMMON;
   @Input() canAddToProgression = false;
 
   @Output() chordPcsChanged    = new EventEmitter<{ pcs: Set<number>; label: string } | null>();
@@ -39,14 +41,14 @@ export class ChordHighlighterComponent implements OnChanges {
     this.chords = [];
     this.selectedChord = null;
     if (!this.isVisible || !this.highlightSet) return;
-    this.chords = getDiatonicChords(this.highlightSet.root, this.highlightSet.intervals, this.chordExtension);
+    this.chords = getDiatonicChords(this.highlightSet.root, this.highlightSet.intervals, this.chordExtension, this.spelling);
   }
 
   selectExtension(extension: ChordExtension): void {
     if (this.chordExtension === extension || !this.highlightSet) return;
 
     this.chordExtension = extension;
-    this.chords = getDiatonicChords(this.highlightSet.root, this.highlightSet.intervals, extension);
+    this.chords = getDiatonicChords(this.highlightSet.root, this.highlightSet.intervals, extension, this.spelling);
 
     if (this.selectedChord) {
       this.selectedChord = null;

@@ -12,9 +12,9 @@
       <button class="opt-btn" [class.active]="rootSelectorView === 'circle'" (click)="rootSelectorView = 'circle'">Circle of Fifths</button>
     </div>
     @if (rootSelectorView === 'linear') {
-      <app-root-selector [selectedPc]="selectedRoot" [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" (rootSelected)="onRootSelected($event)" />
+      <app-root-selector [selectedPc]="selectedRoot" [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" [spelling]="rootSpelling" (rootSelected)="onRootSelected($event)" />
     } @else {
-      <app-circle-of-fifths-selector [selectedPc]="selectedRoot" [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" (rootSelected)="onRootSelected($event)" />
+      <app-circle-of-fifths-selector [selectedPc]="selectedRoot" [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" [spelling]="rootSpelling" (rootSelected)="onRootSelected($event)" />
     }
   </div>
   <div class="control-group">
@@ -25,6 +25,7 @@
 
 <app-chord-highlighter
   [highlightSet]="highlightSet"
+  [spelling]="scaleSpelling"
   [canAddToProgression]="canAddChordHighlightToProgression"
   (chordPcsChanged)="onChordHighlighted($event)"
   (chordSelected)="onChordSelected($event)"
@@ -48,6 +49,7 @@
   <app-fretboard
     [tuning]="selectedTuning"
     [highlightSet]="mainVoicing ? null : highlightSet"
+    [noteNames]="scaleSpelling"
     [activeRegion]="activeRegion"
     [voicing]="mainVoicing"
     [showNoteLabels]="showNoteLabels"

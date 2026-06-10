@@ -44,8 +44,76 @@ export function fretForPitchClass(rootPc: number, stringNum: number, tuning: rea
   return (rootPc - PITCH_OF[tuning[6 - stringNum]] + 12) % 12;
 }
 
-export function noteNameAt(stringNum: number, fret: number, tuning: readonly string[]): string {
-  return NOTE_NAMES_COMMON[noteAt(stringNum, fret, tuning)];
+export function noteNameAt(stringNum: number, fret: number, tuning: readonly string[], spelling: readonly string[] = NOTE_NAMES_COMMON): string {
+  return spelling[noteAt(stringNum, fret, tuning)];
+}
+
+function letterOf(name: string): string {
+  return name[0];
+}
+
+// Spell a single pitch class, avoiding letters already used by earlier scale
+// degrees. Falls back to the common spelling when both the sharp and flat
+// letters are taken (e.g. chromatic runs or extreme keys).
+function spellPitchClass(pc: PitchClass, used: Set<string>, preferSharp: boolean): { name: string; isFallback: boolean } {
+  const sharpName = NOTE_NAMES_SHARP[pc];
+  const flatName  = NOTE_NAMES_FLAT[pc];
+  if (sharpName === flatName) {
+    return { name: sharpName, isFallback: used.has(letterOf(sharpName)) };
+  }
+  const sharpFree = !used.has(letterOf(sharpName));
+  const flatFree  = !used.has(letterOf(flatName));
+  if (sharpFree && flatFree) return { name: preferSharp ? sharpName : flatName, isFallback: false };
+  if (flatFree) return { name: flatName, isFallback: false };
+  if (sharpFree) return { name: sharpName, isFallback: false };
+  return { name: NOTE_NAMES_COMMON[pc], isFallback: true };
+}
+
+// Walk a scale's pitch classes in order, assigning each one a letter name not
+// yet used by an earlier degree (falling back to the common spelling on
+// collision). `rootName`, when given, fixes the spelling of the root note.
+function spellScale(rootPc: PitchClass, intervals: readonly number[], rootName: string | undefined, preferSharp: boolean): { spelling: Map<PitchClass, string>; fallbacks: number } {
+  const used = new Set<string>();
+  const spelling = new Map<PitchClass, string>();
+  let fallbacks = 0;
+
+  intervals.forEach((interval, i) => {
+    const pc = (rootPc + interval) % 12;
+    let name: string;
+    if (i === 0 && rootName) {
+      name = rootName;
+    } else {
+      const result = spellPitchClass(pc, used, preferSharp);
+      name = result.name;
+      if (result.isFallback) fallbacks++;
+    }
+    used.add(letterOf(name));
+    spelling.set(pc, name);
+  });
+
+  return { spelling, fallbacks };
+}
+
+// Compute a pitch-class -> note name table for a scale, choosing sharp or
+// flat spellings so that letter names don't repeat within the scale (e.g.
+// C Locrian -> C, Db, Eb, F, Gb, Ab, Bb instead of reusing C/F/G/A as both
+// natural and accidental). Pitch classes outside the scale fall back to
+// NOTE_NAMES_COMMON. Both an all-flat-leaning and an all-sharp-leaning
+// spelling are tried (seeding the root with `rootName` when given, e.g. an
+// explicit "C#" vs "Db" choice) and whichever yields fewer fallback
+// collisions across the scale wins (ties favor flat) — this is what makes
+// e.g. E major resolve to E F# G# A B C# D# rather than starting from C's
+// flat-leaning defaults.
+export function getScaleSpelling(rootPc: PitchClass, intervals: readonly number[], rootName?: string): string[] {
+  const sharpRoot = rootName ?? NOTE_NAMES_SHARP[rootPc];
+  const flatRoot  = rootName ?? NOTE_NAMES_FLAT[rootPc];
+  const rootIsFixed = sharpRoot === flatRoot;
+
+  const flatResult  = spellScale(rootPc, intervals, rootIsFixed ? undefined : flatRoot, false);
+  const sharpResult = spellScale(rootPc, intervals, rootIsFixed ? undefined : sharpRoot, true);
+  const chosen = flatResult.fallbacks <= sharpResult.fallbacks ? flatResult.spelling : sharpResult.spelling;
+
+  return Array.from({ length: 12 }, (_, pc) => chosen.get(pc) ?? NOTE_NAMES_COMMON[pc]);
 }
 
 

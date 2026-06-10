@@ -43,18 +43,21 @@ function donutSlicePath(startAngle: number, endAngle: number): string {
   styleUrl: './circle-of-fifths-selector.scss'
 })
 export class CircleOfFifthsSelectorComponent extends RootSelectorBase {
-  readonly segments: CircleSegment[] = CIRCLE_OF_FIFTHS_ORDER.map((pc, index) => {
-    const root = ROOT_BUTTONS.find(r => r.pc === pc)!;
-    const centerAngle = index * 30;
-    const halfGap = SEGMENT_GAP_DEG / 2;
-    const label = polarToCartesian(RADIUS_LABEL, centerAngle);
-    return {
-      pc,
-      dual: root.dual,
-      lines: root.dual ? root.name.split('/') : [root.name],
-      path: donutSlicePath(centerAngle - 15 + halfGap, centerAngle + 15 - halfGap),
-      labelX: label.x,
-      labelY: label.y,
-    };
-  });
+  get segments(): CircleSegment[] {
+    return CIRCLE_OF_FIFTHS_ORDER.map((pc, index) => {
+      const root = ROOT_BUTTONS.find(r => r.pc === pc)!;
+      const centerAngle = index * 30;
+      const halfGap = SEGMENT_GAP_DEG / 2;
+      const label = polarToCartesian(RADIUS_LABEL, centerAngle);
+      const dual = root.dual && !this.spelling;
+      return {
+        pc,
+        dual,
+        lines: dual ? root.name.split('/') : [this.spelling ? this.spelling[pc] : root.name],
+        path: donutSlicePath(centerAngle - 15 + halfGap, centerAngle + 15 - halfGap),
+        labelX: label.x,
+        labelY: label.y,
+      };
+    });
+  }
 }

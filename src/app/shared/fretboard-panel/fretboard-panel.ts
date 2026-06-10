@@ -3,6 +3,7 @@ import { Voicing } from '../../core/voicing';
 import { Region } from '../../core/region';
 import { Tuning, STANDARD_TUNING } from '../../core/tuning';
 import { FretboardComponent, HighlightSet } from '../../fretboard/fretboard';
+import { NOTE_NAMES_COMMON, getScaleSpelling } from '../../core/pitch';
 
 export interface FretboardPanel {
   id: string;
@@ -31,6 +32,12 @@ export class FretboardPanelComponent {
   @Input() currentTuning: Tuning = STANDARD_TUNING;
   @Output() close            = new EventEmitter<string>();
   @Output() addToProgression = new EventEmitter<Voicing>();
+
+  get noteNames(): readonly string[] {
+    return this.panel.highlightSet
+      ? getScaleSpelling(this.panel.highlightSet.root, this.panel.highlightSet.intervals)
+      : NOTE_NAMES_COMMON;
+  }
 
   get canAddToProgression(): boolean {
     if (this.panel.type !== 'voicing' || !this.panel.voicing) return false;
