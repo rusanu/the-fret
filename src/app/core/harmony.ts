@@ -1,4 +1,11 @@
 import { NOTE_NAMES_COMMON } from './pitch';
+import { TONE_NAMES } from './voicing';
+
+// Scale-degree label for a semitone offset from the chord root (e.g. 6 -> "b5"),
+// matching the degree notation shown on the fretboard.
+function degreeLabel(semitones: number): string {
+  return TONE_NAMES[((semitones % 12) + 12) % 12];
+}
 
 export interface DiatonicChord {
   chordRootPc: number;
@@ -32,10 +39,10 @@ const TRIAD_SUFFIX: Record<TriadQuality, string> = { maj: '', min: 'm', dim: '°
 // the seventh's interval (in semitones) above the chord root.
 function seventhSuffix(quality: TriadQuality, seventh: number): string {
   switch (quality) {
-    case 'maj': return seventh === 11 ? 'maj7' : seventh === 10 ? '7' : `7(${seventh})`;
-    case 'min': return seventh === 10 ? 'm7' : seventh === 11 ? 'm(maj7)' : `m7(${seventh})`;
-    case 'dim': return seventh === 9 ? '°7' : seventh === 10 ? 'm7♭5' : `°7(${seventh})`;
-    case 'aug': return seventh === 10 ? '7♯5' : seventh === 11 ? 'maj7♯5' : `+7(${seventh})`;
+    case 'maj': return seventh === 11 ? 'maj7' : seventh === 10 ? '7' : `7(${degreeLabel(seventh)})`;
+    case 'min': return seventh === 10 ? 'm7' : seventh === 11 ? 'm(maj7)' : `m7(${degreeLabel(seventh)})`;
+    case 'dim': return seventh === 9 ? '°7' : seventh === 10 ? 'm7♭5' : `°7(${degreeLabel(seventh)})`;
+    case 'aug': return seventh === 10 ? '7♯5' : seventh === 11 ? 'maj7♯5' : `+7(${degreeLabel(seventh)})`;
   }
 }
 
@@ -43,7 +50,7 @@ function seventhSuffix(quality: TriadQuality, seventh: number): string {
 // trailing "7" into a "9", anything else is appended as an alteration.
 function ninthSuffix(seventh: string, ninth: number): string {
   if (ninth === 14) return seventh.replace(/7(?!.*7)/, '9');
-  const alt = ninth === 13 ? '♭9' : ninth === 15 ? '♯9' : `${ninth}`;
+  const alt = ninth === 13 ? '♭9' : ninth === 15 ? '♯9' : degreeLabel(ninth);
   return `${seventh}(${alt})`;
 }
 
@@ -77,15 +84,18 @@ export function getDiatonicChords(
     const chordRootPc = (scaleRootPc + rootInt) % 12;
     const rootName = NOTE_NAMES_COMMON[chordRootPc];
 
-    const [, third, fifth, seventh, ninth] = offsets;
+    // Always derive the triad quality from the actual 3rd/5th, regardless of
+    // extension, so the Roman numeral correctly reflects the scale degree.
+    const third = diatonicInterval(scaleIntervals, i + 2) - rootInt;
+    const fifth = diatonicInterval(scaleIntervals, i + 4) - rootInt;
     const quality = triadQuality(third, fifth);
 
     let qualSuffix: string;
     switch (extension) {
-      case 'power':   qualSuffix = '5'; break;
+      case 'power':   qualSuffix = fifth === 7 ? '5' : fifth === 6 ? '(♭5)' : fifth === 8 ? '(♯5)' : `(${degreeLabel(fifth)})`; break;
       case 'triad':   qualSuffix = TRIAD_SUFFIX[quality]; break;
-      case 'seventh': qualSuffix = seventhSuffix(quality, seventh); break;
-      case 'ninth':   qualSuffix = ninthSuffix(seventhSuffix(quality, seventh), ninth); break;
+      case 'seventh': qualSuffix = seventhSuffix(quality, offsets[3]); break;
+      case 'ninth':   qualSuffix = ninthSuffix(seventhSuffix(quality, offsets[3]), offsets[4]); break;
     }
 
     const numeralBase   = ROMAN[i % n] ?? String(i + 1);

@@ -9,7 +9,7 @@ const TONE_SEMITONES: Record<string, number> = {
   'b5': 6, '5': 7, 'b6': 8, '6': 9, 'b7': 10, '7': 11,
 };
 
-const TONE_NAMES: string[] = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'];
+export const TONE_NAMES: string[] = ['1', 'b2', '2', 'b3', '3', '4', 'b5', '5', 'b6', '6', 'b7', '7'];
 
 export interface VoicingCandidate {
   string: number;
