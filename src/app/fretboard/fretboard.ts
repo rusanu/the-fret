@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { noteAt, noteNameAt } from '../core/pitch';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
-import { maxStringOnFret, Voicing } from '../core/caged';
+import { maxStringOnFret, Voicing } from '../core/voicing';
 import { Region } from '../core/region';
 import { STANDARD_TUNING } from '../core/tuning';
 

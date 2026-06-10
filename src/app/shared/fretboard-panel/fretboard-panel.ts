@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Voicing } from '../../core/caged';
+import { Voicing } from '../../core/voicing';
 import { Region } from '../../core/region';
 import { Tuning, STANDARD_TUNING } from '../../core/tuning';
 import { FretboardComponent, HighlightSet } from '../../fretboard/fretboard';

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output } from '@angular/core';
 import { ProgressionItem } from '../core/progression-item';
-import { Voicing } from '../core/caged';
+import { Voicing } from '../core/voicing';
 import { MiniVoicingComponent } from '../shared/mini-voicing/mini-voicing';
 
 @Component({

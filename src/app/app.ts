@@ -10,7 +10,7 @@ import { FretboardPanelComponent, FretboardPanel } from './shared/fretboard-pane
 import { ProgressionPlayerComponent } from './progression/progression-player';
 import { ProgressionItem } from './core/progression-item';
 import { PitchSetDef, pitchesInSet } from './core/pitch-set';
-import { findBestShape, findVoicing, Voicing, VoicingPosition } from './core/caged';
+import { findVoicing, Voicing, VoicingPosition } from './core/voicing';
 import { DiatonicChord } from './core/harmony';
 import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_COMMON, noteAt } from './core/pitch';
@@ -133,6 +133,7 @@ export class App {
   // ── Chord finder ────────────────────────────────────────────────────────
 
   onChordFind(query: ChordQuery): void {
+    /*
     const shapeId = query.shapeId !== 'auto' ? query.shapeId : undefined;
     const voicing = findBestShape(query.rootPc, query.intervals, query.chordName, query.fret, this.selectedTuning, shapeId);
     if (!voicing) { this.chordNoResult = true; return; }
@@ -151,6 +152,7 @@ export class App {
       tuning: this.selectedTuning,
       chordHighlightPcs: null,
     }, ...this.panels];
+    */
   }
 
   // ── Panels ──────────────────────────────────────────────────────────────
@@ -238,28 +240,21 @@ export class App {
 
     const shapeId = undefined;
 
-    this.activeChordVoicing = this.activeRegion && this.selectedSetDef ? findVoicing(
+    // If no region is actively selected well fake one on the first 5 frets + nut
+    this.activeChordVoicing = this.selectedSetDef ? findVoicing(
         this.activeHighlightedChord.chordRootPc,
         this.activeHighlightedChord.intervals,
         this.activeHighlightedChord.name,
-        this.activeRegion,
+        this.activeRegion ?? {
+          startFret: 0,
+          endFret: 4,
+          id: 'open',
+          name: 'Open',
+          shortLabel: 'open',
+          group: 'caged'
+        },
         this.selectedSetDef,
         this.selectedTuning) : null;
-
-    // If the locked shape has no template for this chord quality (e.g. G-shape minor),
-    // fall back to finding the nearest voicing of any shape near the same fret range.
-    this.activeChordVoicing ??=
-      findBestShape(
-        this.activeHighlightedChord.chordRootPc,
-        this.activeHighlightedChord.intervals,
-        this.activeHighlightedChord.name,
-        targetFret, this.selectedTuning, shapeId,
-      ) ?? (shapeId ? findBestShape(
-        this.activeHighlightedChord.chordRootPc,
-        this.activeHighlightedChord.intervals,
-        this.activeHighlightedChord.name,
-        targetFret, this.selectedTuning,
-      ) : null);
   }
 
   private recomputeRegions(): void {

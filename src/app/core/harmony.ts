@@ -12,14 +12,14 @@ const ROMAN = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 
 // Return the interval (semitones above scale root) for scale degree `degree`,
 // wrapping correctly into the next octave when degree >= intervals.length.
-function diatonicInterval(intervals: readonly number[], degree: number): number {
+export function diatonicInterval(intervals: readonly number[], degree: number): number {
   const n = intervals.length;
   return intervals[((degree % n) + n) % n] + Math.floor(degree / n) * 12;
 }
 
-type TriadQuality = 'maj' | 'min' | 'dim' | 'aug';
+export type TriadQuality = 'maj' | 'min' | 'dim' | 'aug';
 
-function triadQuality(third: number, fifth: number): TriadQuality {
+export function triadQuality(third: number, fifth: number): TriadQuality {
   if (third === 4 && fifth === 8) return 'aug';
   if (third === 4 && fifth === 7) return 'maj';
   if (third === 3 && fifth === 7) return 'min';

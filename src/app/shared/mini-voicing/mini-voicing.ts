@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { maxStringOnFret, Voicing } from '../../core/caged';
+import { maxStringOnFret, Voicing } from '../../core/voicing';
 
 interface Dot    { cx: number; cy: number; isRoot: boolean; }
 interface Marker { x: number; y: number; symbol: string; isX: boolean; }

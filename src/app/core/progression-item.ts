@@ -1,4 +1,4 @@
-import { Voicing } from './caged';
+import { Voicing } from './voicing';
 
 export interface ProgressionItem {
   id: string;
