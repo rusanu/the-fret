@@ -29,7 +29,7 @@
   dominant-baseline: auto;
 
   &.marker-x { fill: #c04040; }
-  &.marker-o { fill: #777; }
+  &.marker-o { fill: #999; }
 }
 
 .barre-bar {
@@ -51,13 +51,13 @@
 .fret-label {
   font-size: 9px;
   font-family: monospace;
-  fill: #777;
+  fill: #999;
   dominant-baseline: middle;
 }
 
 .fret-pos-label {
   font-size: 8px;
   font-family: monospace;
-  fill: #555;
+  fill: #888;
   dominant-baseline: middle;
 }
