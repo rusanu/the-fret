@@ -1,0 +1,32 @@
+<svg class="circle-of-fifths" viewBox="0 0 200 200">
+  @for (seg of segments; track seg.pc) {
+    <path
+      class="segment"
+      [class.active]="selectedPc === seg.pc"
+      [class.in-set]="selectedPc !== seg.pc && inSetPcs.has(seg.pc)"
+      [class.in-chord]="inChordPcs?.has(seg.pc)"
+      [attr.d]="seg.path"
+      (click)="select(seg.pc)"
+    />
+  }
+  @for (seg of segments; track seg.pc) {
+    <text
+      class="segment-label"
+      [class.dual]="seg.dual"
+      [class.active]="selectedPc === seg.pc"
+      [class.in-set]="selectedPc !== seg.pc && inSetPcs.has(seg.pc)"
+      [class.in-chord]="inChordPcs?.has(seg.pc)"
+      [attr.x]="seg.labelX"
+      [attr.y]="seg.labelY"
+      text-anchor="middle"
+      dominant-baseline="middle"
+    >
+      @if (seg.lines.length === 1) {
+        {{ seg.lines[0] }}
+      } @else {
+        <tspan [attr.x]="seg.labelX" dy="-0.5em">{{ seg.lines[0] }}</tspan>
+        <tspan [attr.x]="seg.labelX" dy="1.1em">{{ seg.lines[1] }}</tspan>
+      }
+    </text>
+  }
+</svg>

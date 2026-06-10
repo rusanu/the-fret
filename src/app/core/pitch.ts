@@ -6,6 +6,26 @@ export const NOTE_NAMES_FLAT   = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab
 // Used as the default display name throughout the UI.
 export const NOTE_NAMES_COMMON = ['C', 'C#', 'D', 'Eb', 'E', 'F', 'F#', 'G', 'Ab', 'A', 'Bb', 'B'];
 
+export interface RootButton { name: string; pc: PitchClass; dual: boolean; }
+
+export const ROOT_BUTTONS: RootButton[] = [
+  { name: 'C',     pc: 0,  dual: false },
+  { name: 'C#/Db', pc: 1,  dual: true  },
+  { name: 'D',     pc: 2,  dual: false },
+  { name: 'Eb/D#', pc: 3,  dual: true  },
+  { name: 'E',     pc: 4,  dual: false },
+  { name: 'F',     pc: 5,  dual: false },
+  { name: 'F#/Gb', pc: 6,  dual: true  },
+  { name: 'G',     pc: 7,  dual: false },
+  { name: 'Ab/G#', pc: 8,  dual: true  },
+  { name: 'A',     pc: 9,  dual: false },
+  { name: 'Bb/A#', pc: 10, dual: true  },
+  { name: 'B',     pc: 11, dual: false },
+];
+
+// Circle of fifths, starting at C and proceeding clockwise (C, G, D, A, E, B, F#, Db, Ab, Eb, Bb, F).
+export const CIRCLE_OF_FIFTHS_ORDER: PitchClass[] = [0, 7, 2, 9, 4, 11, 6, 1, 8, 3, 10, 5];
+
 const PITCH_OF: Record<string, number> = {
   C: 0, 'C#': 1, Db: 1, D: 2, 'D#': 3, Eb: 3, E: 4,
   F: 5, 'F#': 6, Gb: 6, G: 7, 'G#': 8, Ab: 8, A: 9,

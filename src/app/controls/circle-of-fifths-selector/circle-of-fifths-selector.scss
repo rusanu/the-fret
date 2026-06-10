@@ -1,0 +1,61 @@
+@use '../root-selector/colors' as c;
+
+:host { display: block; }
+
+.circle-of-fifths {
+  width: 220px;
+  height: 220px;
+}
+
+.segment {
+  fill: c.$bg-default;
+  stroke: c.$border-default;
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill 0.12s, stroke 0.12s;
+
+  &:hover {
+    fill: c.$bg-hover;
+    stroke: c.$border-hover;
+  }
+
+  &.in-set {
+    fill: c.$bg-in-set;
+    stroke: c.$border-in-set;
+    &.in-chord {
+      fill: c.$bg-in-set-chord;
+      stroke: c.$border-in-set-chord;
+    }
+  }
+
+  &.active {
+    fill: c.$bg-active;
+    stroke: c.$border-active;
+    &.in-chord {
+      fill: c.$bg-active-chord;
+      stroke: c.$border-active-chord;
+    }
+  }
+}
+
+.segment-label {
+  font-size: 11px;
+  font-family: monospace;
+  fill: c.$text-default;
+  pointer-events: none;
+  user-select: none;
+
+  &.dual {
+    font-size: 9px;
+    letter-spacing: -0.02em;
+  }
+
+  &.in-set {
+    fill: c.$text-in-set;
+  }
+
+  &.active {
+    fill: c.$text-active;
+    font-weight: 700;
+  }
+}

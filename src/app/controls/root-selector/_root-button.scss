@@ -1,0 +1,47 @@
+@use 'colors' as c;
+
+.root-btn {
+  min-width: 34px;
+  padding: 5px 4px;
+  border: 1px solid c.$border-default;
+  border-radius: 4px;
+  background: c.$bg-default;
+  color: c.$text-default;
+  font-size: 12px;
+  font-family: monospace;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: c.$bg-hover;
+    border-color: c.$border-hover;
+    color: c.$text-hover;
+  }
+
+  &.dual {
+    font-size: 9px;
+    min-width: 44px;
+    letter-spacing: -0.02em;
+  }
+
+  &.in-set {
+    background: c.$bg-in-set;
+    border-color: c.$border-in-set;
+    color: c.$text-in-set;
+    &.in-chord {
+      border-color: c.$border-in-set-chord;
+      background: c.$bg-in-set-chord;
+    }
+  }
+
+  &.active {
+    background: c.$bg-active;
+    border-color: c.$border-active;
+    color: c.$text-active;
+    font-weight: 700;
+    &.in-chord {
+      border-color: c.$border-active-chord;
+      background: c.$bg-active-chord;
+    }
+  }
+}

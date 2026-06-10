@@ -5,7 +5,15 @@
       "Bash(git commit -m 'feat: chord progressions with animation *)",
       "Bash(git commit -m 'fix: NG0100 ExpressionChangedAfterItHasBeenChecked *)",
       "Bash(git commit -m 'fix: chord chip highlights on first click *)",
-      "Bash(git commit -m 'feat: mini chord diagram in progression cards *)"
+      "Bash(git commit -m 'feat: mini chord diagram in progression cards *)",
+      "Bash(npx ng *)",
+      "Skill(run)",
+      "Skill(run:*)",
+      "Bash(echo \"started with pid $!\")",
+      "Bash(sleep 8; cat /tmp/ng-serve.log)",
+      "Read(//tmp/**)",
+      "Read(//c/tmp/**)",
+      "Bash(chromium-cli --help)"
     ]
   }
 }

@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { FretboardComponent, HighlightSet } from './fretboard/fretboard';
 import { RootSelectorComponent } from './controls/root-selector/root-selector';
+import { CircleOfFifthsSelectorComponent } from './controls/circle-of-fifths-selector/circle-of-fifths-selector';
 import { PitchSetSelectorComponent } from './controls/pitch-set-selector/pitch-set-selector';
 
 import { TuningSelectorComponent } from './controls/tuning-selector/tuning-selector';
@@ -19,7 +20,7 @@ import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [FretboardComponent, RootSelectorComponent, PitchSetSelectorComponent,
+  imports: [FretboardComponent, RootSelectorComponent, CircleOfFifthsSelectorComponent, PitchSetSelectorComponent,
             TuningSelectorComponent, ChordHighlighterComponent,
             /*ChordFinderComponent, */ FretboardPanelComponent, ProgressionPlayerComponent],
   templateUrl: './app.html',
@@ -31,6 +32,7 @@ export class App {
   selectedTuning: Tuning = STANDARD_TUNING;
 
   labelMode: 'notes' | 'degrees' = 'notes';
+  rootSelectorView: 'linear' | 'circle' = 'linear';
 
   readonly showNoteLabels = true;
   get showDegrees(): boolean { return this.labelMode === 'degrees'; }

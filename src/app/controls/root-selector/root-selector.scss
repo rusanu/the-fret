@@ -1,54 +1,9 @@
+@use 'root-button';
+
 :host { display: block; }
 
 .root-selector {
   display: flex;
   gap: 3px;
   flex-wrap: wrap;
-}
-
-.root-btn {
-  min-width: 34px;
-  padding: 5px 4px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  background: #1a1a1a;
-  color: #999;
-  font-size: 12px;
-  font-family: monospace;
-  cursor: pointer;
-  transition: background 0.12s, color 0.12s, border-color 0.12s;
-
-  &:hover {
-    background: #252525;
-    border-color: #555;
-    color: #e0e0e0;
-  }
-
-  &.dual {
-    font-size: 9px;
-    min-width: 44px;
-    letter-spacing: -0.02em;
-  }
-
-  &.in-set {
-    background: #1a5c8a;
-    border-color: #3a9fd0;
-    color: #dde8ff;
-    &.in-chord {
-      border-color: #2a8060;
-      background: #1a3a28;    
-    }
-  }
-
-
-  &.active {
-    background: #c8a84b;
-    border-color: #c8a84b;
-    color: #0f0f0f;
-    font-weight: 700;
-    &.in-chord {
-      border-color: #2a8060;
-      background: #abc84b;    
-    }
-  }
 }

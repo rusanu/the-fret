@@ -7,22 +7,19 @@
 <div class="controls-bar">
   <div class="control-group">
     <span class="control-label">Root</span>
-    <app-root-selector [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" (rootSelected)="onRootSelected($event)" />
+    <div class="opt-btns">
+      <button class="opt-btn" [class.active]="rootSelectorView === 'linear'" (click)="rootSelectorView = 'linear'">Linear</button>
+      <button class="opt-btn" [class.active]="rootSelectorView === 'circle'" (click)="rootSelectorView = 'circle'">Circle of Fifths</button>
+    </div>
+    @if (rootSelectorView === 'linear') {
+      <app-root-selector [selectedPc]="selectedRoot" [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" (rootSelected)="onRootSelected($event)" />
+    } @else {
+      <app-circle-of-fifths-selector [selectedPc]="selectedRoot" [inSetPcs]="inSetPcs" [inChordPcs]="chordHighlightPcs" (rootSelected)="onRootSelected($event)" />
+    }
   </div>
   <div class="control-group">
     <span class="control-label">Scale / Arpeggio</span>
     <app-pitch-set-selector (setSelected)="onSetSelected($event)" />
-  </div>
-  <div class="control-group">
-    <span class="control-label">Tuning</span>
-    <app-tuning-selector (tuningSelected)="onTuningSelected($event)" />
-  </div>
-  <div class="control-group">
-    <span class="control-label">Labels</span>
-    <div class="opt-btns">
-      <button class="opt-btn" [class.active]="labelMode === 'notes'"   (click)="labelMode = 'notes'">Notes</button>
-      <button class="opt-btn" [class.active]="labelMode === 'degrees'" [disabled]="!highlightSet" (click)="labelMode = 'degrees'">Degrees</button>
-    </div>
   </div>
 </div>
 
@@ -35,6 +32,19 @@
 />
 
 <main>
+<div class="controls-bar">
+  <div class="control-group">
+    <span class="control-label">Tuning</span>
+    <app-tuning-selector (tuningSelected)="onTuningSelected($event)" />
+  </div>
+  <div class="control-group">
+    <span class="control-label">Labels</span>
+    <div class="opt-btns">
+      <button class="opt-btn" [class.active]="labelMode === 'notes'"   (click)="labelMode = 'notes'">Notes</button>
+      <button class="opt-btn" [class.active]="labelMode === 'degrees'" [disabled]="!highlightSet" (click)="labelMode = 'degrees'">Degrees</button>
+    </div>
+  </div>  
+</div>  
   <app-fretboard
     [tuning]="selectedTuning"
     [highlightSet]="mainVoicing ? null : highlightSet"
@@ -48,11 +58,12 @@
     [selectedRegionId]="activeRegion?.id ?? null"
     (regionBandClick)="onRegionSelected($event)"
   />
-  <div class="main-actions">
+</main>
+<div class="main-actions">
+  <div class="control-group">
     <button class="save-btn" [disabled]="!canSave" (click)="onSaveMain()">Save view</button>
   </div>
-</main>
-
+</div>
 <!-- 
 <div class="chord-bar">
   <span class="control-label">Chord finder</span>
