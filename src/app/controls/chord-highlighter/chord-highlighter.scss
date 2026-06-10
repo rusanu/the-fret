@@ -18,6 +18,36 @@
   flex-shrink: 0;
 }
 
+.extension-selector {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.ext-btn {
+  padding: 3px 8px;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  background: #181818;
+  color: #888;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:hover {
+    background: #222;
+    border-color: #444;
+  }
+
+  &.active {
+    background: #1a3a28;
+    border-color: #2a8060;
+    color: #8addb8;
+  }
+}
+
 .chord-chips {
   display: flex;
   gap: 6px;

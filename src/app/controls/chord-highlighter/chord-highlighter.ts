@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { DiatonicChord, getDiatonicTriads } from '../../core/harmony';
+import { ChordExtension, DiatonicChord, getDiatonicChords } from '../../core/harmony';
 import { HighlightSet } from '../../fretboard/fretboard';
 
 @Component({
@@ -16,8 +16,16 @@ export class ChordHighlighterComponent implements OnChanges {
   @Output() chordSelected      = new EventEmitter<DiatonicChord | null>();
   @Output() addToProgression   = new EventEmitter<DiatonicChord>();
 
+  readonly extensions: { value: ChordExtension; label: string }[] = [
+    { value: 'power',   label: 'Power' },
+    { value: 'triad',   label: 'Triad' },
+    { value: 'seventh', label: 'Seventh' },
+    { value: 'ninth',   label: 'Ninth' },
+  ];
+
   chords: DiatonicChord[] = [];
   selectedChord: DiatonicChord | null = null;
+  chordExtension: ChordExtension = 'triad';
 
   get isVisible(): boolean {
     return (this.highlightSet?.intervals.length ?? 0) >= 4 && !this.highlightSet?.strings;
@@ -31,7 +39,20 @@ export class ChordHighlighterComponent implements OnChanges {
     this.chords = [];
     this.selectedChord = null;
     if (!this.isVisible || !this.highlightSet) return;
-    this.chords = getDiatonicTriads(this.highlightSet.root, this.highlightSet.intervals);
+    this.chords = getDiatonicChords(this.highlightSet.root, this.highlightSet.intervals, this.chordExtension);
+  }
+
+  selectExtension(extension: ChordExtension): void {
+    if (this.chordExtension === extension || !this.highlightSet) return;
+
+    this.chordExtension = extension;
+    this.chords = getDiatonicChords(this.highlightSet.root, this.highlightSet.intervals, extension);
+
+    if (this.selectedChord) {
+      this.selectedChord = null;
+      this.chordPcsChanged.emit(null);
+      this.chordSelected.emit(null);
+    }
   }
 
   select(chord: DiatonicChord): void {

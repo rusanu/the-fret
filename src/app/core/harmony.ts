@@ -26,32 +26,75 @@ export function triadQuality(third: number, fifth: number): TriadQuality {
   return 'dim'; // m3 + d5
 }
 
-// Compute the any diatonic triads for a scale.  Only meaningful for scales
-// with ≥ 5 notes; caller should filter (
-export function getDiatonicTriads(
+const TRIAD_SUFFIX: Record<TriadQuality, string> = { maj: '', min: 'm', dim: '°', aug: '+' };
+
+// Chord symbol suffix for a triad + seventh, based on the triad quality and
+// the seventh's interval (in semitones) above the chord root.
+function seventhSuffix(quality: TriadQuality, seventh: number): string {
+  switch (quality) {
+    case 'maj': return seventh === 11 ? 'maj7' : seventh === 10 ? '7' : `7(${seventh})`;
+    case 'min': return seventh === 10 ? 'm7' : seventh === 11 ? 'm(maj7)' : `m7(${seventh})`;
+    case 'dim': return seventh === 9 ? '°7' : seventh === 10 ? 'm7♭5' : `°7(${seventh})`;
+    case 'aug': return seventh === 10 ? '7♯5' : seventh === 11 ? 'maj7♯5' : `+7(${seventh})`;
+  }
+}
+
+// Extend a seventh-chord suffix with a ninth: a natural 9th turns the
+// trailing "7" into a "9", anything else is appended as an alteration.
+function ninthSuffix(seventh: string, ninth: number): string {
+  if (ninth === 14) return seventh.replace(/7(?!.*7)/, '9');
+  const alt = ninth === 13 ? '♭9' : ninth === 15 ? '♯9' : `${ninth}`;
+  return `${seventh}(${alt})`;
+}
+
+export type ChordExtension = 'power' | 'triad' | 'seventh' | 'ninth';
+
+// Scale degrees (relative to the chord root, in thirds) included for each extension.
+const EXTENSION_DEGREES: Record<ChordExtension, readonly number[]> = {
+  power:   [0, 4],
+  triad:   [0, 2, 4],
+  seventh: [0, 2, 4, 6],
+  ninth:   [0, 2, 4, 6, 8],
+};
+
+// Compute the diatonic chords for a scale, built from stacked thirds up to
+// the requested extension.  Only meaningful for scales with ≥ 3 notes;
+// caller should filter.
+export function getDiatonicChords(
   scaleRootPc: number,
   scaleIntervals: readonly number[],
+  extension: ChordExtension = 'triad',
 ): DiatonicChord[] {
   const n = scaleIntervals.length;
   if (n < 3) return [];
 
-  return Array.from({ length: n }, (_, i) => {
-    const rootInt  = diatonicInterval(scaleIntervals, i);
-    const thirdInt = diatonicInterval(scaleIntervals, i + 2) - rootInt;
-    const fifthInt = diatonicInterval(scaleIntervals, i + 4) - rootInt;
+  const degrees = EXTENSION_DEGREES[extension];
 
-    const quality  = triadQuality(thirdInt, fifthInt);
+  return Array.from({ length: n }, (_, i) => {
+    const rootInt = diatonicInterval(scaleIntervals, i);
+    const offsets = degrees.map(d => diatonicInterval(scaleIntervals, i + d) - rootInt);
+
     const chordRootPc = (scaleRootPc + rootInt) % 12;
     const rootName = NOTE_NAMES_COMMON[chordRootPc];
 
-    const qualSuffix    = quality === 'min' ? 'm' : quality === 'dim' ? '°' : quality === 'aug' ? '+' : '';
+    const [, third, fifth, seventh, ninth] = offsets;
+    const quality = triadQuality(third, fifth);
+
+    let qualSuffix: string;
+    switch (extension) {
+      case 'power':   qualSuffix = '5'; break;
+      case 'triad':   qualSuffix = TRIAD_SUFFIX[quality]; break;
+      case 'seventh': qualSuffix = seventhSuffix(quality, seventh); break;
+      case 'ninth':   qualSuffix = ninthSuffix(seventhSuffix(quality, seventh), ninth); break;
+    }
+
     const numeralBase   = ROMAN[i % n] ?? String(i + 1);
     const numeralSuffix = quality === 'dim' ? '°' : quality === 'aug' ? '+' : '';
     const numeral       = (quality === 'maj' || quality === 'aug')
       ? `${numeralBase}${numeralSuffix}`
       : `${numeralBase.toLowerCase()}${numeralSuffix}`;
 
-    const intervals: readonly number[] = [0, thirdInt, fifthInt];
+    const intervals: readonly number[] = offsets;
     const pitchClasses = new Set(intervals.map(iv => (chordRootPc + iv) % 12));
 
     return { chordRootPc, intervals, name: `${rootName}${qualSuffix}`, numeral, pitchClasses };

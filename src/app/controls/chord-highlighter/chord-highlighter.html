@@ -1,6 +1,14 @@
 @if (isVisible && chords.length > 0) {
   <div class="chord-highlighter">
-    <span class="control-label">Triads</span>
+    <div class="extension-selector">
+      @for (ext of extensions; track ext.value) {
+        <button
+          class="ext-btn"
+          [class.active]="chordExtension === ext.value"
+          (click)="selectExtension(ext.value)"
+        >{{ ext.label }}</button>
+      }
+    </div>
     <div class="chord-chips">
       @for (chord of chords; track chord.numeral) {
         <button
