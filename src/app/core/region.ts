@@ -1,6 +1,5 @@
 import { fretForPitchClass } from './pitch';
 import { PitchSetDef } from './pitch-set';
-import {triadQuality} from './harmony';
 
 export interface Region {
   id: string;
@@ -68,7 +67,7 @@ function caged(R: number): Region[] {
 // Both low and high-octave (+12 frets) variants are included where they fit (0–24).
 export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: readonly string[]): Region[] {
   const R = fretForPitchClass(rootPc, 6, tuning); // root fret on string 6
-  const setQuality =  setDef.intervals.length >= 5 ? triadQuality(setDef.intervals[2], setDef.intervals[4]) : undefined;
+  const setQuality =  setDef.intervals.length >= 5 ? (setDef.intervals.includes(4) ? 'maj' : 'min') : undefined;
   const isCaged = (setDef.category == 'scale' || setDef.category == 'mode' || setDef.category == 'blues')
     && setDef.intervals.length >= 5
     && !setDef.strings;
@@ -84,11 +83,11 @@ export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: read
       { id: 'pent2', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R + 3, endFret: R + 5  },
     ];
     return base.flatMap(withHigh);
-  } else if (isCaged && (setQuality == 'min' || setQuality == 'dim')) {
+  } else if (isCaged && setQuality == 'min') {
       const pent = minorPentatonic(R);
       const cage = caged(R);
     return [...pent.flatMap(withHigh), ...cage.flatMap(withHigh)];
-  } else if (isCaged && (setQuality == 'maj' || setQuality == 'aug')) {
+  } else if (isCaged && setQuality == 'maj') {
       const pent = majorPentatonic(R);
       const cage = caged(R);
     return [...pent.flatMap(withHigh), ...cage.flatMap(withHigh)];
