@@ -148,22 +148,54 @@ export function findVoicing(chordRootPc: number,
   const pos = candidates(Array.from(chordPitches), [], 1, Array.from(voicingCandidates));
   var all = Array.from(pos);
   var voiced = all.filter(canBeVoiced);
-  var good =  voiced.filter(isLowestRoot);
 
+  // voiced.sort();
+  
+  var good =  voiced.filter(isLowestRoot);
   if (good.length == 0) {
     // Fallback to any voicing, even if root is not lowest
     good = voiced;
   }
-
   if (good.length == 0) {
-    return null;
+     return null;
   }
-
-  good.sort((a,b) => b.length - a.length);
+  good.sort((a,b) => scoreVoicing(chordRootPc, b) - scoreVoicing(chordRootPc, a));
 
   var best = good[0];
 
   return buildVoicing(chordRootPc, chordName, intervals, best);
+}
+
+function scoreVoicing(chordRootPc:number , vcs: VoicingCandidate[]): number {
+  let score = 0;
+
+  // Prefer more notes
+  score += vcs.length * 10;
+
+  // Find string positions of third and extensions
+  const thirdStrings = vcs
+    .filter(vc => (vc.pitch + 12 - chordRootPc) % 12 === 4) // major third
+    .map(vc => vc.string);
+
+  const extensionIntervals = new Set([1, 2, 6, 9, 10, 11]); // 9ths, 6ths, 7ths etc
+  const extensionStrings = vcs
+    .filter(vc => extensionIntervals.has((vc.pitch + 12 - chordRootPc) % 12))
+    .map(vc => vc.string);
+
+  const lowestThird = Math.max(...thirdStrings, 0);    // higher string number = lower pitch
+  const lowestExtension = Math.max(...extensionStrings, 0);
+
+  // Penalize if an extension sits lower (higher string number) than the third
+  if (lowestExtension > lowestThird) {
+    score -= 15;
+  }
+
+  // Reward having the third in the lower strings (5 or 6)
+  if (thirdStrings.some(s => s >= 5)) {
+    score += 8;
+  }
+
+  return score;
 }
 
 export function buildVoicing(chordRootPc: number, chordName: string, intervals:readonly number[], notes: VoicingCandidate[]):Voicing | null {
