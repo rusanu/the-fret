@@ -21,6 +21,7 @@ export class ChordHighlighterComponent implements OnChanges {
   readonly extensions: { value: ChordExtension; label: string }[] = [
     { value: 'power',   label: 'Power' },
     { value: 'triad',   label: 'Triad' },
+    { value: 'add9',    label: 'Add9' },
     { value: 'seventh', label: 'Seventh' },
     { value: 'ninth',   label: 'Ninth' },
   ];

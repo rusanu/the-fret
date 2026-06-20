@@ -54,7 +54,15 @@ function ninthSuffix(seventh: string, ninth: number): string {
   return `${seventh}(${alt})`;
 }
 
-export type ChordExtension = 'power' | 'triad' | 'seventh' | 'ninth';
+// Suffix for a triad + added 9th (no 7th).
+function add9Suffix(quality: TriadQuality, ninth: number): string {
+  const base = TRIAD_SUFFIX[quality];
+  if (ninth === 14) return `${base}add9`;
+  const alt = ninth === 13 ? '♭9' : ninth === 15 ? '♯9' : degreeLabel(ninth);
+  return `${base}add(${alt})`;
+}
+
+export type ChordExtension = 'power' | 'triad' | 'seventh' | 'ninth' | 'add9';
 
 // Scale degrees (relative to the chord root, in thirds) included for each extension.
 const EXTENSION_DEGREES: Record<ChordExtension, readonly number[]> = {
@@ -62,6 +70,7 @@ const EXTENSION_DEGREES: Record<ChordExtension, readonly number[]> = {
   triad:   [0, 2, 4],
   seventh: [0, 2, 4, 6],
   ninth:   [0, 2, 4, 6, 8],
+  add9:    [0, 2, 4, 8],
 };
 
 // Compute the diatonic chords for a scale, built from stacked thirds up to
@@ -97,6 +106,7 @@ export function getDiatonicChords(
       case 'triad':   qualSuffix = TRIAD_SUFFIX[quality]; break;
       case 'seventh': qualSuffix = seventhSuffix(quality, offsets[3]); break;
       case 'ninth':   qualSuffix = ninthSuffix(seventhSuffix(quality, offsets[3]), offsets[4]); break;
+      case 'add9':    qualSuffix = add9Suffix(quality, offsets[3]); break;
     }
 
     const numeralBase   = ROMAN[i % n] ?? String(i + 1);
