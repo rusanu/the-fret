@@ -1,0 +1,5 @@
+<select class="capo-select" [value]="capo" (change)="onChange($event)">
+  @for (opt of options; track opt) {
+    <option [value]="opt" [selected]="opt === capo">{{ opt === 0 ? 'None' : 'Fret ' + opt }}</option>
+  }
+</select>

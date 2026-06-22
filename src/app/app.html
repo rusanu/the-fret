@@ -39,6 +39,10 @@
     <app-tuning-selector (tuningSelected)="onTuningSelected($event)" />
   </div>
   <div class="control-group">
+    <span class="control-label">Capo</span>
+    <app-capo-selector [capo]="selectedSetup.capo" (capoChanged)="onCapoChanged($event)" />
+  </div>
+  <div class="control-group">
     <span class="control-label">Labels</span>
     <div class="opt-btns">
       <button class="opt-btn" [class.active]="labelMode === 'notes'"   (click)="labelMode = 'notes'">Notes</button>
@@ -48,6 +52,7 @@
 </div>  
   <app-fretboard
     [tuning]="selectedTuning"
+    [capo]="selectedCapo"
     [highlightSet]="mainVoicing ? null : highlightSet"
     [noteNames]="scaleSpelling"
     [activeRegion]="activeRegion"
@@ -75,6 +80,7 @@
 
 <app-progression-player
   [items]="progressionItems"
+  [capo]="selectedCapo"
   (activeVoicingChanged)="onProgressionActiveVoicingChanged($event)"
   (removeItem)="onRemoveProgressionItem($event)"
   (clearAll)="onClearProgression()"
@@ -86,6 +92,7 @@
       <app-fretboard-panel
         [panel]="panel"
         [currentTuning]="selectedTuning"
+        [currentCapo]="selectedCapo"
         (close)="onRemovePanel($event)"
         (addToProgression)="onAddVoicingToProgression($event)"
       />

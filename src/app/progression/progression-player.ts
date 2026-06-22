@@ -12,6 +12,7 @@ import { MiniVoicingComponent } from '../shared/mini-voicing/mini-voicing';
 })
 export class ProgressionPlayerComponent implements OnChanges, OnDestroy {
   @Input() items: ProgressionItem[] = [];
+  @Input() capo = 0;
 
   @Output() activeVoicingChanged = new EventEmitter<Voicing | null>();
   @Output() removeItem           = new EventEmitter<string>();

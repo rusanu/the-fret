@@ -13,6 +13,7 @@ interface Barre  { x1: number; x2: number; cy: number; }
 })
 export class MiniVoicingComponent implements OnChanges {
   @Input() voicing!: Voicing;
+  @Input() capo = 0;
 
   // ── Layout constants ──────────────────────────────────────────────────────
   private readonly SS    = 11;  // string spacing
@@ -57,13 +58,16 @@ export class MiniVoicingComponent implements OnChanges {
 
     const positions  = this.voicing.positions;
     const muted      = new Set(this.voicing.mutedStrings);
-    const hasOpen    = positions.some(p => p.fret === 0);
-    const nonZero    = positions.filter(p => p.fret > 0).map(p => p.fret);
+    const isCapoHeld = (fret: number) => this.capo > 0 && fret === this.capo;
+    const hasTrueOpen = positions.some(p => p.fret === 0);
+    const hasOpen    = hasTrueOpen || positions.some(p => isCapoHeld(p.fret));
+    const fingered   = positions.filter(p => p.fret > 0 && !isCapoHeld(p.fret));
+    const nonZero    = fingered.map(p => p.fret);
     const minFret    = nonZero.length ? Math.min(...nonZero) : 1;
 
-    // Open chords (any fret-0) must show the nut — force startFret = 1.
-    // Movable chords start at their lowest fretted position (the barre fret).
-    this.startFret = hasOpen ? 1 : minFret;
+    // True open chords (fret-0) show the nut — force startFret = 1.
+    // Capo-held strings are "open" but the diagram window starts at the fingered positions.
+    this.startFret = hasTrueOpen ? 1 : minFret;
 
     const showLabel = this.startFret > 1;
     this.showLabel  = showLabel;
@@ -101,17 +105,17 @@ export class MiniVoicingComponent implements OnChanges {
         cy: this.dotY(this.startFret),
       };
     } else {
-      this.barre = this.voicing.barreFret ? {
-          //x1: this.strX(this.voicing.rootString),
-          x1: this.strX(maxStringOnFret(this.voicing.barreFret, this.voicing.positions)),
+      const bf = this.voicing.barreFret;
+      this.barre = bf && !isCapoHeld(bf) ? {
+          x1: this.strX(maxStringOnFret(bf, this.voicing.positions)),
           x2: this.strX(1),
           cy: this.dotY(this.startFret),
-        } : null;      
+        } : null;
     }
 
     // ── Finger dots ────────────────────────────────────────────────────────
     this.dots = positions
-      .filter(p => p.fret > 0 && !(isMovable && p.fret === this.startFret))
+      .filter(p => p.fret > 0 && !isCapoHeld(p.fret) && !(isMovable && p.fret === this.startFret))
       .map(p => ({
         cx: this.strX(p.string),
         cy: this.dotY(p.fret),
@@ -127,7 +131,7 @@ export class MiniVoicingComponent implements OnChanges {
     }
 
     // ── X / O markers ─────────────────────────────────────────────────────
-    const openSt = new Set(positions.filter(p => p.fret === 0).map(p => p.string));
+    const openSt = new Set(positions.filter(p => p.fret === 0 || isCapoHeld(p.fret)).map(p => p.string));
     this.markers = [];
     for (let s = 1; s <= 6; s++) {
       if (muted.has(s)) {

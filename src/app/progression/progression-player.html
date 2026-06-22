@@ -9,7 +9,7 @@
             <span class="chip-label">{{ chipLabel(item) }}</span>
             <button class="chip-remove" (click)="$event.stopPropagation(); onRemove(item.id)">✕</button>
           </div>
-          <app-mini-voicing [voicing]="item.voicing" />
+          <app-mini-voicing [voicing]="item.voicing" [capo]="capo" />
         </div>
       }
     </div>

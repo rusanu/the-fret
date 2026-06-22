@@ -15,13 +15,14 @@ import { findVoicing, Voicing, VoicingPosition } from './core/voicing';
 import { DiatonicChord } from './core/harmony';
 import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_COMMON, getScaleSpelling, noteAt } from './core/pitch';
-import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
+import { Tuning, STANDARD_TUNING, TUNING_PRESETS, GuitarSetup, DEFAULT_SETUP } from './core/tuning';
+import { CapoSelectorComponent } from './controls/capo-selector/capo-selector';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [FretboardComponent, RootSelectorComponent, CircleOfFifthsSelectorComponent, PitchSetSelectorComponent,
-            TuningSelectorComponent, ChordHighlighterComponent,
+            TuningSelectorComponent, CapoSelectorComponent, ChordHighlighterComponent,
             /*ChordFinderComponent, */ FretboardPanelComponent, ProgressionPlayerComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
@@ -29,7 +30,10 @@ import { Tuning, STANDARD_TUNING, TUNING_PRESETS } from './core/tuning';
 export class App {
   selectedRoot: number | null = null;
   selectedSetDef: PitchSetDef | null = null;
-  selectedTuning: Tuning = STANDARD_TUNING;
+  selectedSetup: GuitarSetup = DEFAULT_SETUP;
+
+  get selectedTuning(): Tuning { return this.selectedSetup.tuning; }
+  get selectedCapo(): number { return this.selectedSetup.capo; }
 
   labelMode: 'notes' | 'degrees' = 'notes';
   rootSelectorView: 'linear' | 'circle' = 'linear';
@@ -65,10 +69,15 @@ export class App {
   }
 
   private tuningTag(): string {
-    if (this.selectedTuning === STANDARD_TUNING) return '';
-    const preset = TUNING_PRESETS.find(p => p.strings === this.selectedTuning);
-    const shortName = preset ? preset.name.split(' — ')[0] : 'Custom';
-    return ` [${shortName}]`;
+    const parts: string[] = [];
+    if (this.selectedTuning !== STANDARD_TUNING) {
+      const preset = TUNING_PRESETS.find(p => p.strings === this.selectedTuning);
+      parts.push(preset ? preset.name.split(' — ')[0] : 'Custom');
+    }
+    if (this.selectedCapo > 0) {
+      parts.push(`Capo ${this.selectedCapo}`);
+    }
+    return parts.length ? ` [${parts.join(', ')}]` : '';
   }
 
   get inSetPcs(): Set<number> {
@@ -119,11 +128,20 @@ export class App {
   }
 
   onTuningSelected(tuning: Tuning): void {
-    this.selectedTuning = tuning;
+    this.selectedSetup = { ...this.selectedSetup, tuning };
     this.progressionItems = [];
     this.progressionActiveVoicing = null;
     this.activeChordVoicing = null;
     this.recomputeRegions();
+  }
+
+  onCapoChanged(capo: number): void {
+    this.selectedSetup = { ...this.selectedSetup, capo };
+    this.progressionItems = [];
+    this.progressionActiveVoicing = null;
+    this.activeChordVoicing = null;
+    this.recomputeRegions();
+    this.recomputeChordVoicing();
   }
 
   // ── Chord highlighter ───────────────────────────────────────────────────
@@ -164,6 +182,7 @@ export class App {
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
       tuning: this.selectedTuning,
+      capo: this.selectedCapo,
       chordHighlightPcs: null,
     }, ...this.panels];
     */
@@ -186,6 +205,7 @@ export class App {
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
       tuning: this.selectedTuning,
+      capo: this.selectedCapo,
       chordHighlightPcs: this.chordHighlightPcs,
     }, ...this.panels];
   }
@@ -260,15 +280,15 @@ export class App {
         this.activeHighlightedChord.intervals,
         this.activeHighlightedChord.name,
         this.activeRegion ?? {
-          startFret: 0,
-          endFret: 4,
+          startFret: this.selectedCapo,
+          endFret: this.selectedCapo + 4,
           id: 'open',
           name: 'Open',
           shortLabel: 'open',
           group: 'caged'
         },
         this.selectedSetDef,
-        this.selectedTuning) : null;
+        this.selectedSetup) : null;
   }
 
   private recomputeRegions(): void {
@@ -276,7 +296,7 @@ export class App {
     this.regions = 
       this.selectedRoot !== null &&
       this.selectedSetDef != null
-      ? computeRegions(this.selectedRoot, this.selectedSetDef,  this.selectedTuning)
+      ? computeRegions(this.selectedRoot, this.selectedSetDef, this.selectedSetup)
       : [];
     this.activeRegion = prevId ? (this.regions.find(r => r.id === prevId) ?? null) : null;
   }

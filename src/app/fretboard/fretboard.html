@@ -26,6 +26,22 @@
       />
     }
 
+    <!-- Capo dead zone and bar -->
+    @if (capoBar) {
+      <rect
+        [attr.x]="neckX" [attr.y]="neckY"
+        [attr.width]="capoDeadZoneWidth" [attr.height]="neckH"
+        class="capo-dead-zone"
+      />
+      <rect
+        [attr.x]="capoBar.x" [attr.y]="capoBar.y1"
+        [attr.width]="capoBar.width"
+        [attr.height]="capoBar.y2 - capoBar.y1"
+        rx="3"
+        class="capo-bar"
+      />
+    }
+
     <!-- Fret inlay dots -->
     @for (dot of inlayDots; track dot.id) {
       <circle [attr.cx]="dot.cx" [attr.cy]="dot.cy" r="4" class="inlay-dot" />
@@ -67,6 +83,7 @@
         <circle
           [attr.cx]="note.cx" [attr.cy]="note.cy" [attr.r]="DOT_R"
           [class.note-open]="note.isOpen"
+          [class.below-capo]="note.belowCapo"
           [class.state-root]="note.state === 'root'"
           [class.state-in-set]="note.state === 'in-set'"
           [class.state-out-of-set]="note.state === 'out-of-set'"

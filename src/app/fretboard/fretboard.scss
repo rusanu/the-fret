@@ -22,6 +22,16 @@
   stroke-width: 1.5;
 }
 
+.capo-dead-zone {
+  fill: rgba(0, 0, 0, 0.45);
+}
+
+.capo-bar {
+  fill: #8B7355;
+  stroke: #6B5335;
+  stroke-width: 1.5;
+}
+
 .fret-wire {
   stroke: #5a5a5a;
   stroke-width: 1.5;
@@ -85,6 +95,9 @@
     opacity: 0.22;
   }
 }
+
+// Notes below the capo are unplayable
+.note-dot.below-capo { opacity: 0.05; }
 
 // Dim out-of-set notes when a set is active
 .fretboard.dim-unset .note-dot.state-out-of-set { opacity: 0.08; }

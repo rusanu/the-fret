@@ -21,8 +21,16 @@ interface NoteCell {
   name: string;
   degree: string;
   isOpen: boolean;
+  belowCapo: boolean;
   state: NoteState;
   inRegion: boolean;
+}
+
+interface CapoBar {
+  x: number;
+  y1: number;
+  y2: number;
+  width: number;
 }
 
 interface VoicingDot {
@@ -70,6 +78,7 @@ interface BandCell {
 })
 export class FretboardComponent implements OnInit, OnChanges {
   @Input() tuning: readonly string[] = STANDARD_TUNING;
+  @Input() capo = 0;
   @Input() fretCount = 24;
   @Input() showNoteLabels = false;
   @Input() showDegrees = false;
@@ -117,6 +126,8 @@ export class FretboardComponent implements OnInit, OnChanges {
   voicingDots: VoicingDot[] = [];
   mutedMarkers: MutedMarker[] = [];
   voicingBarre: VoicingBarre | null = null;
+  capoBar: CapoBar | null = null;
+  capoDeadZoneWidth = 0;
 
   private readonly MARKER_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21]);
   private readonly DOUBLE_FRETS  = new Set([12, 24]);
@@ -126,7 +137,7 @@ export class FretboardComponent implements OnInit, OnChanges {
   ngOnInit(): void { this.rebuild(); }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if ('tuning' in changes || 'fretCount' in changes || 'highlightSet' in changes ||
+    if ('tuning' in changes || 'capo' in changes || 'fretCount' in changes || 'highlightSet' in changes ||
         'activeRegion' in changes || 'voicing' in changes || 'noteNames' in changes ||
         'regionBands' in changes || 'selectedRegionId' in changes) {
       this.rebuild();
@@ -222,12 +233,28 @@ export class FretboardComponent implements OnInit, OnChanges {
       x: this.LW - 5, y: this.ny(s) + 4, label: String(s)
     }));
 
+    // Capo bar and dead zone
+    if (this.capo > 0) {
+      const capoWireX = this.LW + (this.capo + 1) * this.FW;
+      this.capoBar = {
+        x: capoWireX - 4,
+        y1: this.ny(1) - 8,
+        y2: this.ny(6) + 8,
+        width: 8,
+      };
+      this.capoDeadZoneWidth = capoWireX - this.neckX;
+    } else {
+      this.capoBar = null;
+      this.capoDeadZoneWidth = 0;
+    }
+
     // Voicing dots (replaces scale dots when voicing is active)
     if (this.voicing) {
       const positions    = this.voicing.positions;
-      const nonZero      = positions.filter(p => p.fret > 0).map(p => p.fret);
+      const fingered     = positions.filter(p => p.fret > 0 && !(this.capo > 0 && p.fret === this.capo));
+      const nonZero      = fingered.map(p => p.fret);
       const barFret      = nonZero.length ? Math.min(...nonZero) : 0;
-      const hasOpenStr   = positions.some(p => p.fret === 0);
+      const hasOpenStr   = positions.some(p => p.fret === 0 || (this.capo > 0 && p.fret === this.capo));
       // Barre only for CAGED shapes with no open strings (i.e. movable/barre chords).
       // Open chords: strings share frets by coincidence — no barre finger.
       // Power chords: index finger plays root only, no cross-string barre.
@@ -246,10 +273,11 @@ export class FretboardComponent implements OnInit, OnChanges {
         };
       } else {
 
-        this.voicingBarre = this.voicing.barreFret ? {
-          cx: this.nx(this.voicing.barreFret!),
+        const bfret = this.voicing.barreFret;
+        this.voicingBarre = bfret && !(this.capo > 0 && bfret === this.capo) ? {
+          cx: this.nx(bfret),
           y1: this.ny(1) - this.DOT_R,
-          y2: this.ny(maxStringOnFret(this.voicing.barreFret, this.voicing.positions)) + this.DOT_R,
+          y2: this.ny(maxStringOnFret(bfret, this.voicing.positions)) + this.DOT_R,
         } : null;
       }
 
@@ -262,7 +290,7 @@ export class FretboardComponent implements OnInit, OnChanges {
           tone: p.tone,
           noteName: noteNameAt(p.string, p.fret, this.tuning, this.noteNames),
           isRoot: p.tone === '1',
-          isOpen: p.fret === 0,
+          isOpen: p.fret === 0 || (this.capo > 0 && p.fret === this.capo),
         }));
       this.mutedMarkers = this.voicing.mutedStrings.map(s => ({
         id: `mx${s}`, cx: this.nx(0), cy: this.ny(s),
@@ -303,7 +331,8 @@ export class FretboardComponent implements OnInit, OnChanges {
         }
 
         const inRegion = !region || (f >= region.startFret && f <= region.endFret);
-        this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), pc, name, degree, isOpen: f === 0, state, inRegion });
+        const belowCapo = this.capo > 0 && f < this.capo;
+        this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), pc, name, degree, isOpen: f === 0, belowCapo, state, inRegion });
       }
     }
   }

@@ -1,7 +1,7 @@
 import { fretForPitchClass, NOTE_NAMES_COMMON, noteAt } from './pitch';
 import { pitchesInSet, PitchSetDef } from './pitch-set';
 import { Region } from './region';
-import { Tuning } from './tuning';
+import { GuitarSetup } from './tuning';
 
 // Semitone interval above chord root for each tone label
 const TONE_SEMITONES: Record<string, number> = {
@@ -33,20 +33,23 @@ export interface Voicing {
   mutedStrings: number[];
 }
 
-export function findVoicing(chordRootPc: number, 
-  intervals: readonly number[], 
+export function findVoicing(chordRootPc: number,
+  intervals: readonly number[],
   chordName: string,
-  activeRegion: Region, 
+  activeRegion: Region,
   scale: PitchSetDef,
-  selectedTuning: Tuning): Voicing | null {
+  setup: GuitarSetup): Voicing | null {
+  const tuning = setup.tuning;
+  const capo = setup.capo;
   const chordPitches = pitchesInSet(chordRootPc, intervals);
 
   let voicingCandidates = new Set<VoicingCandidate>();
 
-  for (let s=1;s<=selectedTuning.length; ++s) {
-    for (let f = activeRegion.startFret;f<=activeRegion.endFret;++f)
+  const minFret = Math.max(activeRegion.startFret, capo);
+  for (let s=1;s<=tuning.length; ++s) {
+    for (let f = minFret;f<=activeRegion.endFret;++f)
     {
-      const note = noteAt(s, f, selectedTuning);
+      const note = noteAt(s, f, tuning);
       if (chordPitches.has(note)) {
         const vp:VoicingCandidate = {
           string: s,
@@ -103,20 +106,17 @@ export function findVoicing(chordRootPc: number,
     if ((bottomS == 6) && (topS != 7 - vcs.length)) return false;
     if ((bottomS - topS + 1) != vcs.length) return false;
 
-   //  console.log(topS, bottomS, vcs);
+    // Positions at the capo fret are held by the capo — no finger needed
+    const fingered = vcs.filter(vc => vc.fret > capo);
 
-    // now count the required fingers/fret
-    // One can barre first fret (index) up to all strings
-    // One can barre 2-3 strings with other fingers too but will skip for now
-    // 
-   
-    const fretFingers = vcs.reduce((acc, vc) => {
+    if (fingered.length === 0) return true;
+
+    const fretFingers = fingered.reduce((acc, vc) => {
        var crt = acc.get(vc.fret) ?? 0;
        acc.set(vc.fret, crt + 1);
        return acc;
     }, new Map<number,number>());
 
-    // Stupid JS string number sort
     const frets = Array.from(fretFingers.keys()).sort((a,b) => a-b);
 
     if (frets.length > 4) return false;

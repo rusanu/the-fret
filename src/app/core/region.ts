@@ -1,5 +1,6 @@
 import { fretForPitchClass } from './pitch';
 import { PitchSetDef } from './pitch-set';
+import { GuitarSetup } from './tuning';
 
 export interface Region {
   id: string;
@@ -65,56 +66,69 @@ function caged(R: number): Region[] {
 
 // Compute all named regions for a given root.
 // Both low and high-octave (+12 frets) variants are included where they fit (0–24).
-export function computeRegions(rootPc: number, setDef: PitchSetDef, tuning: readonly string[]): Region[] {
-  const R = fretForPitchClass(rootPc, 6, tuning); // root fret on string 6
+export function computeRegions(rootPc: number, setDef: PitchSetDef, setup: GuitarSetup): Region[] {
+  const R = fretForPitchClass(rootPc, 6, setup.tuning); // root fret on string 6
   const setQuality =  setDef.intervals.length >= 5 ? (setDef.intervals.includes(4) ? 'maj' : 'min') : undefined;
   const isCaged = (setDef.category == 'scale' || setDef.category == 'mode' || setDef.category == 'blues')
     && setDef.intervals.length >= 5
     && !setDef.strings;
 
+  let result: Region[];
+
   if (setDef.name == 'BB King') {
     const base: Region[] = [
       { id: 'bbk', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R+5,     endFret: R + 9  },
     ];
-    return base.flatMap(withHigh);
+    result = base.flatMap(withHigh);
   }
   else if (setDef.name == 'Alfred King') {
     const base: Region[] = [
       { id: 'pent2', shortLabel: 'Box', name: 'Box', group: 'pentatonic', startFret: R + 3, endFret: R + 5  },
     ];
-    return base.flatMap(withHigh);
+    result = base.flatMap(withHigh);
   } else if (isCaged && setQuality == 'min') {
       const pent = minorPentatonic(R);
       const cage = caged(R);
-    return [...pent.flatMap(withHigh), ...cage.flatMap(withHigh)];
+    result = [...pent.flatMap(withHigh), ...cage.flatMap(withHigh)];
   } else if (isCaged && setQuality == 'maj') {
       const pent = majorPentatonic(R);
       const cage = caged(R);
-    return [...pent.flatMap(withHigh), ...cage.flatMap(withHigh)];
+    result = [...pent.flatMap(withHigh), ...cage.flatMap(withHigh)];
   }
 
-/*  
-  else if (setDef.name == 'Minor blues') return minorPentatonic(R).flatMap(withHigh);
-  else if (setDef.name == 'Major blues') return majorPentatonic(R).flatMap(withHigh);
+/*
+  else if (setDef.name == 'Minor blues') result = minorPentatonic(R).flatMap(withHigh);
+  else if (setDef.name == 'Major blues') result = majorPentatonic(R).flatMap(withHigh);
   else if (setDef.name == 'Minor pentatonic') {
     const base: Region[] = minorPentatonic(R);
     const caged: Region[] = majorCaged(R);
-    return [...base.flatMap(withHigh),...caged.flatMap(withHigh)];
-  }  
+    result = [...base.flatMap(withHigh),...caged.flatMap(withHigh)];
+  }
   else if (setDef.name == 'Major pentatonic') {
     const base: Region[] = majorPentatonic(R);
-    return [...base.flatMap(withHigh)];
+    result = [...base.flatMap(withHigh)];
   }
   else if (setDef.category == 'scale' && setDef.intervals.length == 7) {
 
     const base= majorCaged(R);
 
-    return base.flatMap(withHigh); 
+    result = base.flatMap(withHigh);
   }
   else if (setDef.category == 'mode' && setDef.intervals.length == 7) {
     const base= majorCaged(R);
-    return base.flatMap(withHigh); 
+    result = base.flatMap(withHigh);
   }
 */
-  return [];
+  else {
+    result = [];
+  }
+
+  return clampRegionsToCapo(result, setup.capo);
+}
+
+function clampRegionsToCapo(regions: Region[], capo: number): Region[] {
+  if (capo === 0) return regions;
+  return regions
+    .filter(r => r.endFret >= capo)
+    .map(r => r.startFret < capo ? { ...r, startFret: capo } : r);
 }

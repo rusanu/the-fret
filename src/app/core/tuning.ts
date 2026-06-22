@@ -5,6 +5,11 @@ export interface TuningDef {
   strings: Tuning; // index 0 = string 6 (low), index 5 = string 1 (high)
 }
 
+export interface GuitarSetup {
+  readonly tuning: Tuning;
+  readonly capo: number; // 0 = no capo, 1–12 = capo fret
+}
+
 export const TUNING_PRESETS: readonly TuningDef[] = [
   { name: 'Standard — E A D G B E',          strings: ['E',  'A',  'D',  'G',  'B',  'E' ] },
   { name: 'Drop D — D A D G B E',            strings: ['D',  'A',  'D',  'G',  'B',  'E' ] },
@@ -15,3 +20,5 @@ export const TUNING_PRESETS: readonly TuningDef[] = [
 
 // Index 0 = string 6 (low E), index 5 = string 1 (high E)
 export const STANDARD_TUNING: Tuning = TUNING_PRESETS[0].strings;
+
+export const DEFAULT_SETUP: GuitarSetup = { tuning: STANDARD_TUNING, capo: 0 };

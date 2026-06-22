@@ -15,6 +15,7 @@ export interface FretboardPanel {
   showNoteLabels: boolean;
   showDegrees: boolean;
   tuning: Tuning;
+  capo: number;
   chordHighlightPcs: Set<number> | null;
 }
 
@@ -30,6 +31,7 @@ export { STANDARD_TUNING }; // re-export for panel creation convenience
 export class FretboardPanelComponent {
   @Input() panel!: FretboardPanel;
   @Input() currentTuning: Tuning = STANDARD_TUNING;
+  @Input() currentCapo = 0;
   @Output() close            = new EventEmitter<string>();
   @Output() addToProgression = new EventEmitter<Voicing>();
 
@@ -41,8 +43,9 @@ export class FretboardPanelComponent {
 
   get canAddToProgression(): boolean {
     if (this.panel.type !== 'voicing' || !this.panel.voicing) return false;
-    // Panel tuning must match the active tuning — cross-tuning progressions are unplayable.
-    return this.panel.tuning.length === this.currentTuning.length &&
+    // Panel tuning+capo must match — cross-tuning/capo progressions are unplayable.
+    return this.panel.capo === this.currentCapo &&
+           this.panel.tuning.length === this.currentTuning.length &&
            this.panel.tuning.every((s, i) => s === this.currentTuning[i]);
   }
 }
