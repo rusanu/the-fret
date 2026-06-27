@@ -96,6 +96,35 @@
 
 .chord-chip.active .chip-name { color: #8addb8; font-weight: 600; }
 
+.chord-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-left: 6px;
+}
+
+.voicing-toggle-btn {
+  padding: 4px 10px;
+  border: 1px solid #2a2a2a;
+  border-radius: 4px;
+  background: #181818;
+  color: #888;
+  font-size: 11px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+
+  &:hover {
+    background: #222;
+    border-color: #444;
+  }
+
+  &.active {
+    background: #1c3050;
+    border-color: #2d5888;
+    color: #7ab0e0;
+  }
+}
+
 .add-progression-btn {
   padding: 4px 10px;
   border: 1px solid #2a3a1a;
@@ -104,7 +133,6 @@
   color: #6ac050;
   font-size: 11px;
   cursor: pointer;
-  margin-left: 6px;
   transition: background 0.12s;
 
   &:hover { background: #1e3018; }

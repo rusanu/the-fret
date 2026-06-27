@@ -21,8 +21,15 @@
         </button>
       }
     </div>
-    @if (canAddToProgression && selectedChord) {
-      <button class="add-progression-btn" (click)="onAddToProgression()">+ Progression</button>
+    @if (selectedChord) {
+      <div class="chord-actions">
+        <button class="voicing-toggle-btn"
+                [class.active]="showVoicingChoices"
+                (click)="toggleVoicingChoices.emit()">Voicings</button>
+        @if (canAddToProgression) {
+          <button class="add-progression-btn" (click)="onAddToProgression()">+ Progression</button>
+        }
+      </div>
     }
   </div>
 }

@@ -95,6 +95,38 @@
   padding: 0.4rem 1rem 0;
 }
 
+.voicing-choices {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0.5rem 1.5rem;
+  background: #0c0c14;
+  border-bottom: 1px solid #1e1e2e;
+}
+
+.voicing-choices-strip {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.voicing-choice-chip {
+  padding: 6px 8px;
+  border: 1px solid #2a2a3a;
+  border-radius: 5px;
+  background: #141420;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+
+  &:hover { background: #1e1e30; border-color: #3a3a5a; }
+
+  &.active {
+    background: #1a3a28;
+    border-color: #2a8060;
+  }
+}
+
 .panels-section {
   border-top: 2px solid #1a1a1a;
 }

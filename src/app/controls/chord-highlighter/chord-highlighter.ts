@@ -13,10 +13,12 @@ export class ChordHighlighterComponent implements OnChanges {
   @Input() highlightSet: HighlightSet | null = null;
   @Input() spelling: readonly string[] = NOTE_NAMES_COMMON;
   @Input() canAddToProgression = false;
+  @Input() showVoicingChoices = false;
 
   @Output() chordPcsChanged    = new EventEmitter<{ pcs: Set<number>; label: string } | null>();
   @Output() chordSelected      = new EventEmitter<DiatonicChord | null>();
   @Output() addToProgression   = new EventEmitter<DiatonicChord>();
+  @Output() toggleVoicingChoices = new EventEmitter<void>();
 
   readonly extensions: { value: ChordExtension; label: string }[] = [
     { value: 'power',   label: 'Power' },

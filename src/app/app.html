@@ -27,10 +27,27 @@
   [highlightSet]="highlightSet"
   [spelling]="scaleSpelling"
   [canAddToProgression]="canAddChordHighlightToProgression"
+  [showVoicingChoices]="showVoicingChoices"
   (chordPcsChanged)="onChordHighlighted($event)"
   (chordSelected)="onChordSelected($event)"
   (addToProgression)="onAddChordHighlightToProgression($event)"
+  (toggleVoicingChoices)="toggleVoicingChoices()"
 />
+
+@if (activeHighlightedChord && showVoicingChoices && voicingChoices.length > 0) {
+  <div class="voicing-choices">
+    <span class="control-label">Voicings</span>
+    <div class="voicing-choices-strip">
+      @for (v of voicingChoices; track $index) {
+        <div class="voicing-choice-chip"
+             [class.active]="$index === selectedVoicingIndex"
+             (click)="selectVoicingChoice($index)">
+          <app-mini-voicing [voicing]="v" [capo]="selectedCapo" />
+        </div>
+      }
+    </div>
+  </div>
+}
 
 <main>
 <div class="controls-bar">

@@ -11,19 +11,21 @@ import { FretboardPanelComponent, FretboardPanel } from './shared/fretboard-pane
 import { ProgressionPlayerComponent } from './progression/progression-player';
 import { ProgressionItem } from './core/progression-item';
 import { PitchSetDef, pitchesInSet } from './core/pitch-set';
-import { findVoicing, Voicing, VoicingPosition } from './core/voicing';
+import { findVoicing, findVoicings, Voicing, VoicingPosition } from './core/voicing';
 import { DiatonicChord } from './core/harmony';
 import { computeRegions, Region } from './core/region';
 import { NOTE_NAMES_COMMON, getScaleSpelling, noteAt } from './core/pitch';
 import { Tuning, STANDARD_TUNING, TUNING_PRESETS, GuitarSetup, DEFAULT_SETUP } from './core/tuning';
 import { CapoSelectorComponent } from './controls/capo-selector/capo-selector';
+import { MiniVoicingComponent } from './shared/mini-voicing/mini-voicing';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [FretboardComponent, RootSelectorComponent, CircleOfFifthsSelectorComponent, PitchSetSelectorComponent,
             TuningSelectorComponent, CapoSelectorComponent, ChordHighlighterComponent,
-            /*ChordFinderComponent, */ FretboardPanelComponent, ProgressionPlayerComponent],
+            /*ChordFinderComponent, */ FretboardPanelComponent, ProgressionPlayerComponent,
+            MiniVoicingComponent],
   templateUrl: './app.html',
   styleUrl: './app.scss'
 })
@@ -50,6 +52,10 @@ export class App {
   activeHighlightedChord: DiatonicChord | null = null;
   // Voicing computed from the chord highlighter selection (shown on main fretboard)
   activeChordVoicing: Voicing | null = null;
+
+  showVoicingChoices = false;
+  voicingChoices: Voicing[] = [];
+  selectedVoicingIndex = -1;
 
   chordNoResult = false;
   panels: FretboardPanel[] = [];
@@ -156,6 +162,17 @@ export class App {
     this.recomputeChordVoicing();
   }
 
+  toggleVoicingChoices(): void {
+    this.showVoicingChoices = !this.showVoicingChoices;
+    this.selectedVoicingIndex = -1;
+    this.recomputeChordVoicing();
+  }
+
+  selectVoicingChoice(index: number): void {
+    this.selectedVoicingIndex = index;
+    this.activeChordVoicing = this.voicingChoices[index] ?? null;
+  }
+
   onAddChordHighlightToProgression(_chord: DiatonicChord): void {
     if (!this.activeChordVoicing) return;
     this.progressionItems = [...this.progressionItems,
@@ -242,53 +259,55 @@ export class App {
     this.chordHighlightPcs = null;
     this.chordHighlightLabel = null;
     this.activeChordVoicing = null;
+    this.voicingChoices = [];
+    this.selectedVoicingIndex = -1;
   }
 
   private recomputeChordVoicing(): void {
     if (!this.activeHighlightedChord) {
       this.activeChordVoicing = null;
+      this.voicingChoices = [];
+      this.selectedVoicingIndex = -1;
       return;
     }
 
-    const region = this.activeRegion;
-    // Use the center of the region as the anchor fret so the distance
-    // calculation favours voicings inside the region rather than those near fret 0.
-    const targetFret = region ? region.startFret : 0;
+    const region = this.activeRegion ?? {
+      startFret: this.selectedCapo,
+      endFret: this.selectedCapo + 4,
+      id: 'open',
+      name: 'Open',
+      shortLabel: 'open',
+      group: 'caged' as const
+    };
 
-    // // Derive the CAGED shape from the region:
-    // // – CAGED regions: extract shape letter from the id ('caged-a' → 'A')
-    // // – Pentatonic boxes: map to corresponding CAGED shape (Box1=E, Box2=D, Box3=C, Box4=A, Box5=G)
-    // //   This is the fundamental CAGED/pentatonic equivalence — each box occupies the same neck
-    // //   region as its corresponding CAGED chord shape.
-    // const PENT_TO_SHAPE: Record<string, string> = {
-    //   'pent1': 'E', 'pent1h': 'E',
-    //   'pent2': 'D', 'pent2h': 'D',
-    //   'pent3': 'C', 'pent3h': 'C',
-    //   'pent4': 'A', 'pent4h': 'A',
-    //   'pent5': 'G', 'pent5h': 'G',
-    // };
-    // const cagedMatch = region?.id.match(/^caged-([a-g])/);
-    // const shapeId    = cagedMatch
-    //   ? cagedMatch[1].toUpperCase()
-    //   : (region ? PENT_TO_SHAPE[region.id] : undefined);
+    if (!this.selectedSetDef) {
+      this.activeChordVoicing = null;
+      this.voicingChoices = [];
+      this.selectedVoicingIndex = -1;
+      return;
+    }
 
-    const shapeId = undefined;
-
-    // If no region is actively selected well fake one on the first 5 frets + nut
-    this.activeChordVoicing = this.selectedSetDef ? findVoicing(
+    if (this.showVoicingChoices) {
+      this.voicingChoices = findVoicings(
         this.activeHighlightedChord.chordRootPc,
         this.activeHighlightedChord.intervals,
         this.activeHighlightedChord.name,
-        this.activeRegion ?? {
-          startFret: this.selectedCapo,
-          endFret: this.selectedCapo + 4,
-          id: 'open',
-          name: 'Open',
-          shortLabel: 'open',
-          group: 'caged'
-        },
+        region,
         this.selectedSetDef,
-        this.selectedSetup) : null;
+        this.selectedSetup);
+      this.selectedVoicingIndex = this.voicingChoices.length > 0 ? 0 : -1;
+      this.activeChordVoicing = this.voicingChoices[0] ?? null;
+    } else {
+      this.voicingChoices = [];
+      this.selectedVoicingIndex = -1;
+      this.activeChordVoicing = findVoicing(
+        this.activeHighlightedChord.chordRootPc,
+        this.activeHighlightedChord.intervals,
+        this.activeHighlightedChord.name,
+        region,
+        this.selectedSetDef,
+        this.selectedSetup);
+    }
   }
 
   private recomputeRegions(): void {

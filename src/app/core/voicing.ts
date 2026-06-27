@@ -166,6 +166,106 @@ export function findVoicing(chordRootPc: number,
   return buildVoicing(chordRootPc, chordName, intervals, best);
 }
 
+export function findVoicings(chordRootPc: number,
+  intervals: readonly number[],
+  chordName: string,
+  activeRegion: Region,
+  scale: PitchSetDef,
+  setup: GuitarSetup,
+  maxResults = 5): Voicing[] {
+  const tuning = setup.tuning;
+  const capo = setup.capo;
+  const chordPitches = pitchesInSet(chordRootPc, intervals);
+
+  let voicingCandidates = new Set<VoicingCandidate>();
+
+  const minFret = Math.max(activeRegion.startFret, capo);
+  for (let s=1;s<=tuning.length; ++s) {
+    for (let f = minFret;f<=activeRegion.endFret;++f) {
+      const note = noteAt(s, f, tuning);
+      if (chordPitches.has(note)) {
+        voicingCandidates.add({ string: s, fret: f, pitch: note });
+      }
+    }
+  }
+
+  function* candidates(
+    pitches:number[],
+    found: number[],
+    string: number,
+    positions:VoicingCandidate[]):Iterable<VoicingCandidate[]> {
+      if (string > 6) return;
+      const cand = positions.filter(p => p.string == string);
+      for(var p of cand) {
+        if (!pitches.includes(p.pitch)) continue;
+        const newFound = found.includes(p.pitch) ? found : [p.pitch, ...found];
+        const rest = candidates(pitches, newFound, string + 1, positions);
+        for (const r of rest) yield [p, ...r];
+        if (newFound.length == pitches.length) yield [p];
+      }
+      yield* candidates(pitches, found, string + 1, positions);
+    }
+
+  function canBeVoiced(vcs:VoicingCandidate[]):boolean {
+    const topS = vcs.reduce((acc, vc) => Math.min(acc, vc.string), 7);
+    const bottomS = vcs.reduce((acc, vc) => Math.max(acc, vc.string), 0);
+    if (topS != 1 && bottomS < 5) return false;
+    if ((topS == 1) && (bottomS != vcs.length)) return false;
+    if ((bottomS == 6) && (topS != 7 - vcs.length)) return false;
+    if ((bottomS - topS + 1) != vcs.length) return false;
+    const fingered = vcs.filter(vc => vc.fret > capo);
+    if (fingered.length === 0) return true;
+    const fretFingers = fingered.reduce((acc, vc) => {
+       var crt = acc.get(vc.fret) ?? 0;
+       acc.set(vc.fret, crt + 1);
+       return acc;
+    }, new Map<number,number>());
+    const frets = Array.from(fretFingers.keys()).sort((a,b) => a-b);
+    if (frets.length > 4) return false;
+    var cnt = 0;
+    var last = frets[0];
+    for(var i = 0; i<frets.length; ++i) {
+      var fret = frets[i];
+      if (fret - last > 2) return false;
+      cnt += i==0 ? 1 : fretFingers.get(frets[i])!;
+      last = fret;
+    }
+    return cnt <= 4;
+  }
+
+  function isLowestRoot(vcs:VoicingCandidate[]):boolean {
+    var rootString = vcs.reduce((acc, n) => Math.max(acc, n.pitch == chordRootPc ? n.string : 0), 0);
+    var lowestString = vcs.reduce((acc, n) => Math.max(acc, n.string), 0);
+    return rootString == lowestString;
+  }
+
+  const pos = candidates(Array.from(chordPitches), [], 1, Array.from(voicingCandidates));
+  var all = Array.from(pos);
+  var voiced = all.filter(canBeVoiced);
+
+  var good = voiced.filter(isLowestRoot);
+  if (good.length == 0) good = voiced;
+  if (good.length == 0) return [];
+
+  good.sort((a,b) => scoreVoicing(chordRootPc, b) - scoreVoicing(chordRootPc, a));
+
+  // Deduplicate voicings that produce identical fret positions
+  const seen = new Set<string>();
+  const unique: VoicingCandidate[][] = [];
+  for (const v of good) {
+    const key = v.map(c => `${c.string}:${c.fret}`).sort().join(',');
+    if (!seen.has(key)) {
+      seen.add(key);
+      unique.push(v);
+    }
+    if (unique.length >= maxResults) break;
+  }
+
+  return unique
+    .map(v => buildVoicing(chordRootPc, chordName, intervals, v))
+    .filter((v): v is Voicing => v !== null);
+}
+
 function scoreVoicing(chordRootPc:number , vcs: VoicingCandidate[]): number {
   let score = 0;
 
