@@ -121,6 +121,23 @@ export function findVoicing(chordRootPc: number,
 
     if (frets.length > 4) return false;
 
+    // A barre is only valid if every string between the outermost barred
+    // strings is at or above the barre fret (no open/lower strings in between)
+    let barreValid = false;
+    if (fretFingers.get(frets[0])! > 1) {
+      const barreStrings = fingered.filter(vc => vc.fret === frets[0]).map(vc => vc.string);
+      const minBarreS = Math.min(...barreStrings);
+      const maxBarreS = Math.max(...barreStrings);
+      barreValid = true;
+      for (let s = minBarreS; s <= maxBarreS; s++) {
+        const note = vcs.find(vc => vc.string === s);
+        if (!note || note.fret < frets[0]) {
+          barreValid = false;
+          break;
+        }
+      }
+    }
+
     var cnt = 0;
     var last = frets[0];
     for(var i = 0; i<frets.length; ++i) {
@@ -128,10 +145,8 @@ export function findVoicing(chordRootPc: number,
       if (fret < last) {
         console.error('sort!', fret, last, frets, fretFingers);
       }
-      // can't spread fingers too wide
       if (fret - last > 2) return false;
-      // first fret can be a barre
-      cnt +=  i==0 ? 1 : fretFingers.get(frets[i])!;
+      cnt += (i === 0 && barreValid) ? 1 : fretFingers.get(frets[i])!;
       last = fret;
     }
 
@@ -222,12 +237,28 @@ export function findVoicings(chordRootPc: number,
     }, new Map<number,number>());
     const frets = Array.from(fretFingers.keys()).sort((a,b) => a-b);
     if (frets.length > 4) return false;
+
+    let barreValid = false;
+    if (fretFingers.get(frets[0])! > 1) {
+      const barreStrings = fingered.filter(vc => vc.fret === frets[0]).map(vc => vc.string);
+      const minBarreS = Math.min(...barreStrings);
+      const maxBarreS = Math.max(...barreStrings);
+      barreValid = true;
+      for (let s = minBarreS; s <= maxBarreS; s++) {
+        const note = vcs.find(vc => vc.string === s);
+        if (!note || note.fret < frets[0]) {
+          barreValid = false;
+          break;
+        }
+      }
+    }
+
     var cnt = 0;
     var last = frets[0];
     for(var i = 0; i<frets.length; ++i) {
       var fret = frets[i];
       if (fret - last > 2) return false;
-      cnt += i==0 ? 1 : fretFingers.get(frets[i])!;
+      cnt += (i === 0 && barreValid) ? 1 : fretFingers.get(frets[i])!;
       last = fret;
     }
     return cnt <= 4;
