@@ -48,6 +48,29 @@ export function noteNameAt(stringNum: number, fret: number, tuning: readonly str
   return spelling[noteAt(stringNum, fret, tuning)];
 }
 
+// Absolute MIDI note number for each open string, anchored at string 6 = E2 = MIDI 40
+// (the audio-engine convention noted in TODO.md). Index 0 = string 6 ... index 5 = string 1,
+// matching Tuning's layout. Each open string is derived from the one below it via the
+// ascending semitone interval between them — valid because on every supported tuning,
+// adjacent open strings are always less than an octave apart.
+function openStringMidiTable(tuning: readonly string[]): number[] {
+  const midis: number[] = [40 + (PITCH_OF[tuning[0]] - PITCH_OF['E'])];
+  for (let i = 1; i < 6; i++) {
+    const interval = (PITCH_OF[tuning[i]] - PITCH_OF[tuning[i - 1]] + 12) % 12;
+    midis.push(midis[i - 1] + interval);
+  }
+  return midis;
+}
+
+export function midiAt(stringNum: number, fret: number, tuning: readonly string[]): number {
+  return openStringMidiTable(tuning)[6 - stringNum] + fret;
+}
+
+// MIDI 60 = C4, so octave = floor(midi / 12) - 1.
+export function octaveAt(stringNum: number, fret: number, tuning: readonly string[]): number {
+  return Math.floor(midiAt(stringNum, fret, tuning) / 12) - 1;
+}
+
 function letterOf(name: string): string {
   return name[0];
 }

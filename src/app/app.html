@@ -65,9 +65,23 @@
       <button class="opt-btn" [class.active]="labelMode === 'notes'"   (click)="labelMode = 'notes'">Notes</button>
       <button class="opt-btn" [class.active]="labelMode === 'degrees'" [disabled]="!highlightSet" (click)="labelMode = 'degrees'">Degrees</button>
     </div>
-  </div>  
-</div>  
+  </div>
+  <div class="control-group">
+    <span class="control-label">Octaves</span>
+    <div class="opt-btns">
+      <button class="opt-btn" [class.active]="highlightOctaves" (click)="highlightOctaves = !highlightOctaves">Highlight</button>
+    </div>
+    @if (highlightOctaves) {
+      <div class="octave-legend">
+        @for (o of mainBoard.usedOctaves; track o.octave) {
+          <span class="legend-chip"><span class="legend-swatch" [style.background]="o.color"></span>{{ o.octave }}</span>
+        }
+      </div>
+    }
+  </div>
+</div>
   <app-fretboard
+    #mainBoard
     [tuning]="selectedTuning"
     [capo]="selectedCapo"
     [highlightSet]="mainVoicing ? null : highlightSet"
@@ -76,6 +90,7 @@
     [voicing]="mainVoicing"
     [showNoteLabels]="showNoteLabels"
     [showDegrees]="showDegrees"
+    [highlightOctaves]="highlightOctaves"
     [chordHighlightPcs]="mainVoicing ? null : chordHighlightPcs"
     [dimUnset]="true"
     [regionBands]="regions"

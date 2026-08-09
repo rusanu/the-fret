@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { noteAt, noteNameAt, NOTE_NAMES_COMMON } from '../core/pitch';
+import { noteAt, noteNameAt, octaveAt, NOTE_NAMES_COMMON } from '../core/pitch';
+import { octaveColor } from '../core/octave-colors';
 import { degreeLabel, pitchesInSet } from '../core/pitch-set';
 import { maxStringOnFret, Voicing } from '../core/voicing';
 import { Region } from '../core/region';
@@ -43,6 +44,16 @@ interface VoicingDot {
   isOpen: boolean;
 }
 
+interface OctaveCell {
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  octave: number;
+  color: string;
+}
+
 interface MutedMarker {
   id: string;
   cx: number;
@@ -82,6 +93,7 @@ export class FretboardComponent implements OnInit, OnChanges {
   @Input() fretCount = 24;
   @Input() showNoteLabels = false;
   @Input() showDegrees = false;
+  @Input() highlightOctaves = false;
   @Input() dimUnset = true;
   @Input() highlightSet: HighlightSet | null = null;
   @Input() noteNames: readonly string[] = NOTE_NAMES_COMMON;
@@ -128,6 +140,8 @@ export class FretboardComponent implements OnInit, OnChanges {
   voicingBarre: VoicingBarre | null = null;
   capoBar: CapoBar | null = null;
   capoDeadZoneWidth = 0;
+  octaveCells: OctaveCell[] = [];
+  usedOctaves: { octave: number; color: string }[] = [];
 
   private readonly MARKER_FRETS = new Set([3, 5, 7, 9, 15, 17, 19, 21]);
   private readonly DOUBLE_FRETS  = new Set([12, 24]);
@@ -308,10 +322,21 @@ export class FretboardComponent implements OnInit, OnChanges {
     const region = this.activeRegion;
 
     this.notes = [];
+    this.octaveCells = [];
     for (let s = 1; s <= 6; s++) {
       for (let f = 0; f <= fc; f++) {
-        const pc   = noteAt(s, f, this.tuning);
-        const name = noteNameAt(s, f, this.tuning, this.noteNames);
+        const pc     = noteAt(s, f, this.tuning);
+        const name   = noteNameAt(s, f, this.tuning, this.noteNames);
+        const octave = octaveAt(s, f, this.tuning);
+        this.octaveCells.push({
+          id: `o${s}-${f}`,
+          x: this.LW + f * this.FW,
+          y: this.ny(s) - this.SS / 2,
+          w: this.FW,
+          h: this.SS,
+          octave,
+          color: octaveColor(octave),
+        });
 
         let state: NoteState = 'normal';
         let degree = '';
@@ -335,5 +360,8 @@ export class FretboardComponent implements OnInit, OnChanges {
         this.notes.push({ id: `n${s}-${f}`, cx: this.nx(f), cy: this.ny(s), pc, name, degree, isOpen: f === 0, belowCapo, state, inRegion });
       }
     }
+
+    const distinctOctaves = Array.from(new Set(this.octaveCells.map(c => c.octave))).sort((a, b) => a - b);
+    this.usedOctaves = distinctOctaves.map(octave => ({ octave, color: octaveColor(octave) }));
   }
 }

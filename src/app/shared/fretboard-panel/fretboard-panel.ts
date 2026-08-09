@@ -14,6 +14,7 @@ export interface FretboardPanel {
   activeRegion: Region | null;
   showNoteLabels: boolean;
   showDegrees: boolean;
+  highlightOctaves: boolean;
   tuning: Tuning;
   capo: number;
   chordHighlightPcs: Set<number> | null;

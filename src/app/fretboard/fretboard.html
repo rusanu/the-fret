@@ -17,6 +17,18 @@
       class="neck-bg"
     />
 
+    <!-- Octave wash (behind strings/frets/notes, tints the wood per string/fret cell) -->
+    @if (highlightOctaves) {
+      @for (cell of octaveCells; track cell.id) {
+        <rect
+          [attr.x]="cell.x" [attr.y]="cell.y"
+          [attr.width]="cell.w" [attr.height]="cell.h"
+          [attr.fill]="cell.color"
+          class="octave-cell"
+        />
+      }
+    }
+
     <!-- Region bracket overlay (behind notes, on top of neck background) -->
     @if (activeRegion) {
       <rect

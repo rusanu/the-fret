@@ -42,6 +42,7 @@ export class App {
 
   readonly showNoteLabels = true;
   get showDegrees(): boolean { return this.labelMode === 'degrees'; }
+  highlightOctaves = false;
 
   highlightSet: HighlightSet | null = null;
   regions: Region[] = [];
@@ -221,6 +222,7 @@ export class App {
       activeRegion: this.activeRegion ? { ...this.activeRegion } : null,
       showNoteLabels: this.showNoteLabels,
       showDegrees: this.showDegrees,
+      highlightOctaves: this.highlightOctaves,
       tuning: this.selectedTuning,
       capo: this.selectedCapo,
       chordHighlightPcs: this.chordHighlightPcs,

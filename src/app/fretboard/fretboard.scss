@@ -16,6 +16,11 @@
   fill: #1c1206;
 }
 
+.octave-cell {
+  fill-opacity: 0.38;
+  pointer-events: none;
+}
+
 .region-bracket {
   fill: rgba(200, 168, 75, 0.07);
   stroke: rgba(200, 168, 75, 0.28);
